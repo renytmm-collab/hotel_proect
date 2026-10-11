@@ -1,0 +1,70 @@
+/* 前台端按钮样式 - 强制覆盖 */
+
+/* 表格中链接按钮 - 前台端特殊处理 */
+.el-table .el-button--link,
+.el-table .el-button--primary.el-button--link,
+.el-table .cell .el-button {
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1.5 !important;
+  background-color: rgba(64, 158, 255, 0.15) !important;
+  color: #409EFF !important;
+  border: 1px solid #409EFF !important;
+  padding: 6px 12px !important;
+  border-radius: 4px !important;
+  text-decoration: none !important;
+  transition: all 0.3s !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.el-table .el-button--link:hover,
+.el-table .el-button--primary.el-button--link:hover,
+.el-table .cell .el-button:hover {
+  background-color: #409EFF !important;
+  color: white !important;
+  border-color: #409EFF !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 页面中的所有按钮确保可见 */
+.staff-page .el-button,
+.checkout-page .el-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: #f0f2f5 !important;
+  border: 1px solid #dcdfe6 !important;
+  color: #606266 !important;
+}
+
+/* 主要按钮样式 */
+.staff-page .el-button--primary,
+.checkout-page .el-button--primary {
+  background-color: #409EFF !important;
+  border-color: #409EFF !important;
+  color: white !important;
+}
+
+/* 成功按钮样式 */
+.staff-page .el-button--success,
+.checkout-page .el-button--success {
+  background-color: #67C23A !important;
+  border-color: #67C23A !important;
+  color: white !important;
+}
+
+/* 普通链接按钮样式 */
+.staff-page .el-button--link,
+.checkout-page .el-button--link,
+.staff-page .el-button--primary.el-button--link,
+.checkout-page .el-button--primary.el-button--link {
+  display: inline-block !important;
+  background-color: rgba(64, 158, 255, 0.1) !important;
+  color: #409EFF !important;
+  border: 1px solid #d0e6ff !important;
+  padding: 5px 10px !important;
+  border-radius: 4px !important;
+} 

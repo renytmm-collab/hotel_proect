@@ -1,0 +1,10 @@
+{
+  "code": 200,
+  "msg": null,
+  "data": {
+    "todayCheckin": 7,
+    "todayCheckout": 5,
+    "pendingOrders": 12,
+    "availableRooms": 35
+  }
+} 

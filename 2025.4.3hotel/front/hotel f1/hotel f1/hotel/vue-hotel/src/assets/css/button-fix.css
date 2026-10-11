@@ -1,0 +1,180 @@
+/* 修复按钮不可见的问题 - 全局样式 */
+
+/* !important 和更高优先级选择器 */
+html body .el-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-sizing: border-box !important;
+}
+
+/* 基础按钮样式强化 - 更高优先级选择器 */
+html body .el-button {
+  background-color: #ffffff !important;
+  border: 1px solid #dcdfe6 !important;
+  color: #606266 !important;
+  padding: 8px 15px !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: .1s !important;
+  text-align: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  margin: 0 !important;
+}
+
+/* 主要按钮样式 - 更高优先级 */
+html body .el-button--primary {
+  background-color: #409EFF !important;
+  border-color: #409EFF !important;
+  color: #ffffff !important;
+}
+
+/* 成功按钮样式 - 更高优先级 */
+html body .el-button--success {
+  background-color: #67C23A !important;
+  border-color: #67C23A !important;
+  color: #ffffff !important;
+}
+
+/* 警告按钮样式 - 更高优先级 */
+html body .el-button--warning {
+  background-color: #E6A23C !important;
+  border-color: #E6A23C !important;
+  color: #ffffff !important;
+}
+
+/* 危险按钮样式 - 更高优先级 */
+html body .el-button--danger {
+  background-color: #F56C6C !important;
+  border-color: #F56C6C !important;
+  color: #ffffff !important;
+}
+
+/* 次要按钮样式 - 更高优先级 */
+html body .el-button--info {
+  background-color: #909399 !important;
+  border-color: #909399 !important;
+  color: #ffffff !important;
+}
+
+/* 修复text属性按钮不可见的问题 - 更高优先级 */
+html body .el-button--text {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: #409EFF !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  padding: 5px 10px !important;
+}
+
+/* 悬停状态保持明显 - 更高优先级 */
+html body .el-button--text:hover {
+  color: #79bbff !important;
+  background-color: rgba(64, 158, 255, 0.1) !important;
+}
+
+/* 确保图标按钮也可见 - 更高优先级 */
+html body .el-button--text.is-circle {
+  border: 1px solid #dcdfe6 !important;
+  background-color: #f5f7fa !important;
+}
+
+/* 确保plain属性按钮可见 - 更高优先级 */
+html body .el-button.is-plain {
+  background-color: #fff !important;
+  border: 1px solid #dcdfe6 !important;
+  color: #606266 !important;
+}
+
+/* 各种颜色的plain按钮 - 更高优先级 */
+html body .el-button--primary.is-plain {
+  color: #409EFF !important;
+  background-color: #ecf5ff !important;
+  border-color: #b3d8ff !important;
+}
+
+html body .el-button--success.is-plain {
+  color: #67C23A !important;
+  background-color: #f0f9eb !important;
+  border-color: #c2e7b0 !important;
+}
+
+/* 修复link属性按钮的可见性 - 特别是表格内的按钮 - 更高优先级 */
+html body .el-button--link,
+html body .el-button.el-button--primary.is-link,
+html body .el-button[link],
+html body .el-button--primary.el-button--link {
+  background-color: rgba(64, 158, 255, 0.15) !important;
+  border: 1px solid #409EFF !important;
+  color: #409EFF !important;
+  padding: 5px 10px !important;
+  text-decoration: none !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
+  margin: 0 !important;
+}
+
+/* 悬停状态更明显 - 更高优先级 */
+html body .el-button--link:hover,
+html body .el-button.el-button--primary.is-link:hover,
+html body .el-button[link]:hover,
+html body .el-button--primary.el-button--link:hover {
+  color: #fff !important;
+  background-color: #409EFF !important;
+  border-color: #409EFF !important;
+}
+
+/* 表格中的按钮特殊处理 - 更高优先级 */
+html body .el-table .el-button,
+html body .el-table .el-button--primary,
+html body .el-table .el-button--link,
+html body .el-table .el-button--primary.el-button--link {
+  background-color: #ecf5ff !important;
+  color: #409EFF !important;
+  border: 1px solid #409EFF !important;
+  padding: 4px 12px !important;
+  border-radius: 4px !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  margin: 0 !important;
+}
+
+html body .el-table .el-button:hover,
+html body .el-table .el-button--primary:hover,
+html body .el-table .el-button--link:hover,
+html body .el-table .el-button--primary.el-button--link:hover {
+  background-color: #409EFF !important;
+  color: #ffffff !important;
+  border-color: #409EFF !important;
+}
+
+/* 单元格中的按钮样式 - 极高优先级 */
+html body .el-table .cell .el-button,
+html body .el-table .cell .el-button--primary,
+html body .el-table .cell .el-button--link,
+html body .el-table .cell .el-button--primary.el-button--link {
+  background-color: rgba(64, 158, 255, 0.15) !important;
+  color: #409EFF !important;
+  border: 1px solid #409EFF !important;
+  padding: 4px 12px !important;
+  border-radius: 4px !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 确保带图标的按钮图标可见 - 更高优先级 */
+html body .el-button [class*=" el-icon-"],
+html body .el-button [class^=el-icon-],
+html body .el-button .el-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

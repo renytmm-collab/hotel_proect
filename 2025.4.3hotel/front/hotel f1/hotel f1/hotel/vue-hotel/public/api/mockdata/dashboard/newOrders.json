@@ -1,0 +1,11 @@
+{
+  "code": 200,
+  "msg": null,
+  "data": [
+    { "id": "OR2023041001", "guestName": "赵六", "roomType": "豪华大床房", "checkinDate": "2023-04-15", "checkoutDate": "2023-04-17", "createTime": "2023-04-10 10:23" },
+    { "id": "OR2023041002", "guestName": "钱七", "roomType": "标准双床房", "checkinDate": "2023-04-12", "checkoutDate": "2023-04-14", "createTime": "2023-04-10 11:45" },
+    { "id": "OR2023041003", "guestName": "孙八", "roomType": "高级套房", "checkinDate": "2023-04-20", "checkoutDate": "2023-04-22", "createTime": "2023-04-10 13:10" },
+    { "id": "OR2023041004", "guestName": "周九", "roomType": "商务大床房", "checkinDate": "2023-04-18", "checkoutDate": "2023-04-19", "createTime": "2023-04-10 14:22" },
+    { "id": "OR2023041005", "guestName": "吴十", "roomType": "标准大床房", "checkinDate": "2023-04-25", "checkoutDate": "2023-04-28", "createTime": "2023-04-10 15:38" }
+  ]
+} 

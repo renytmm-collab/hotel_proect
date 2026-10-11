@@ -1,0 +1,10 @@
+{
+  "code": 200,
+  "msg": null,
+  "data": [
+    { "status": "已入住", "count": 42, "color": "#F56C6C" },
+    { "status": "可入住", "count": 28, "color": "#67C23A" },
+    { "status": "待打扫", "count": 15, "color": "#E6A23C" },
+    { "status": "维修中", "count": 5, "color": "#909399" }
+  ]
+} 

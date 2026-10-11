@@ -1,0 +1,9 @@
+{
+  "code": 200,
+  "msg": null,
+  "data": [
+    { "id": 1, "roomNumber": "301", "guestName": "张三", "idCard": "110101199001011234", "phone": "13800138001", "checkinTime": "2023-04-10 14:30" },
+    { "id": 2, "roomNumber": "505", "guestName": "李四", "idCard": "310101199202022345", "phone": "13900139002", "checkinTime": "2023-04-10 15:45" },
+    { "id": 3, "roomNumber": "208", "guestName": "王五", "idCard": "440101199303033456", "phone": "13700137003", "checkinTime": "2023-04-10 16:20" }
+  ]
+} 

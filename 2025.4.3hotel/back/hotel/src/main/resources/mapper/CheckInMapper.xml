@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.CheckInMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.employeevo.CheckInListVO">
+        SELECT ci.id, ci.order_id as orderId, bo.order_no as orderNo,
+        ci.room_id as roomId, r.room_number as roomNumber,
+        rt.type_name as roomTypeName, bo.user_id as userId,
+        u.username as username, ci.guest_name as guestName,
+        ci.guest_phone as guestPhone, ci.check_in_time as checkInTime,
+        ci.check_out_date as checkOutDate, ci.deposit, ci.status,
+        e.real_name as operatorName, ci.create_time as createTime
+        FROM check_in_record ci
+        LEFT JOIN booking_order bo ON ci.order_id = bo.id
+        LEFT JOIN room r ON ci.room_id = r.id
+        LEFT JOIN room_type rt ON r.room_type_id = rt.id
+        LEFT JOIN USERS u ON bo.user_id = u.id
+        LEFT JOIN employee e ON ci.operator_id = e.id
+        <where>
+            <if test="roomNumber != null and roomNumber != ''">
+                AND r.room_number LIKE '%' || #{roomNumber} || '%'
+            </if>
+            <if test="guestName != null and guestName != ''">
+                AND ci.guest_name LIKE '%' || #{guestName} || '%'
+            </if>
+            <if test="phone != null and phone != ''">
+                AND ci.guest_phone LIKE '%' || #{phone} || '%'
+            </if>
+            <if test="status != null">
+                AND ci.status = #{status}
+            </if>
+            <if test="startDate != null">
+                AND TRUNC(ci.check_in_time) >= TRUNC(#{startDate,jdbcType=DATE})
+            </if>
+            <if test="endDate != null">
+                AND TRUNC(ci.check_in_time) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+            </if>
+        </where>
+        ORDER BY ci.check_in_time DESC
+    </select>
+    <select id="getDetail" resultType="com.example.hotel_back.Pojo.VO.employeevo.CheckInDetailVO">
+        SELECT ci.id, ci.order_id as orderId, bo.order_no as orderNo,
+               ci.room_id as roomId, r.room_number as roomNumber,
+               rt.type_name as roomTypeName, bo.user_id as userId,
+               u.username as username, ci.guest_name as guestName,
+               ci.guest_phone as guestPhone, ci.guest_id_card as guestIdCard,
+               ci.check_in_time as checkInTime, ci.check_out_date as checkOutDate,
+               ci.deposit, ci.status, ci.operator_id as operatorId,
+               e.real_name as operatorName, ci.remark, ci.create_time as createTime
+        FROM check_in_record ci
+                 LEFT JOIN booking_order bo ON ci.order_id = bo.id
+                 LEFT JOIN room r ON ci.room_id = r.id
+                 LEFT JOIN room_type rt ON r.room_type_id = rt.id
+                 LEFT JOIN USERS u ON bo.user_id = u.id
+                 LEFT JOIN employee e ON ci.operator_id = e.id
+        WHERE ci.id = #{id}
+    </select>
+    <select id="getById" resultType="com.example.hotel_back.Pojo.Entity.CheckIn">
+        SELECT * FROM check_in_record WHERE id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE check_in_record
+        SET status = #{status},
+            check_out_time = #{checkOutTime},
+            update_time = SYSDATE
+        WHERE id = #{id}
+    </update>
+</mapper>

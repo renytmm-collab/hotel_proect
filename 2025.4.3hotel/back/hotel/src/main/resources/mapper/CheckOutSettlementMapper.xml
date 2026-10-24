@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.CheckOutSettlementMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.employeevo.CheckOutListVO">
+        SELECT cos.id, cos.check_in_id as checkInId, cos.order_id as orderId,
+        bo.order_no as orderNo, cos.room_id as roomId, r.room_number as roomNumber,
+        rt.type_name as roomTypeName, cos.user_id as userId,
+        u.username as username, ci.guest_name as guestName,
+        cos.extra_fee as extraFee, cos.damage_fee as damageFee,
+        cos.total_fee as totalFee, cos.deposit_refund as depositRefund,
+        cos.payment_method as paymentMethod, e.real_name as operatorName,
+        cos.create_time as createTime
+        FROM check_out_settlement cos
+        LEFT JOIN check_in_record ci ON cos.check_in_id = ci.id
+        LEFT JOIN booking_order bo ON cos.order_id = bo.id
+        LEFT JOIN room r ON cos.room_id = r.id
+        LEFT JOIN room_type rt ON r.room_type_id = rt.id
+        LEFT JOIN USERS u ON cos.user_id = u.id
+        LEFT JOIN employee e ON cos.operator_id = e.id
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND bo.order_no LIKE '%' || #{orderNo} || '%'
+            </if>
+            <if test="guestName != null and guestName != ''">
+                AND ci.guest_name LIKE '%' || #{guestName} || '%'
+            </if>
+            <if test="startDate != null">
+                AND TRUNC(cos.create_time) >= TRUNC(#{startDate,jdbcType=DATE})
+            </if>
+            <if test="endDate != null">
+                AND TRUNC(cos.create_time) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+            </if>
+        </where>
+        ORDER BY cos.create_time DESC
+    </select>
+    <select id="getDetail" resultType="com.example.hotel_back.Pojo.VO.employeevo.CheckOutListVO">
+        SELECT cos.id, cos.check_in_id as checkInId, cos.order_id as orderId,
+               bo.order_no as orderNo, cos.room_id as roomId, r.room_number as roomNumber,
+               rt.type_name as roomTypeName, cos.user_id as userId,
+               u.username as username, ci.guest_name as guestName,
+               cos.extra_fee as extraFee, cos.damage_fee as damageFee,
+               cos.total_fee as totalFee, cos.deposit_refund as depositRefund,
+               cos.payment_method as paymentMethod, e.real_name as operatorName,
+               cos.create_time as createTime
+        FROM check_out_settlement cos
+                 LEFT JOIN check_in_record ci ON cos.check_in_id = ci.id
+                 LEFT JOIN booking_order bo ON cos.order_id = bo.id
+                 LEFT JOIN room r ON cos.room_id = r.id
+                 LEFT JOIN room_type rt ON r.room_type_id = rt.id
+                 LEFT JOIN USERS u ON cos.user_id = u.id
+                 LEFT JOIN employee e ON cos.operator_id = e.id
+        WHERE cos.id = #{id}
+    </select>
+</mapper>

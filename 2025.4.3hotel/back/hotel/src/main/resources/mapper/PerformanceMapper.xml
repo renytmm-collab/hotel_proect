@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.PerformanceMapper">
+    <select id="getByEmployeeIdAndMonth" resultType="com.example.hotel_back.Pojo.Entity.Performance">
+        SELECT * FROM performance
+        WHERE employee_id = #{employeeId} AND month = #{month}
+    </select>
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.PerformanceVO">
+        SELECT p.id, p.employee_id as employeeId, e.real_name as employeeName,
+        e.emp_no as empNo,
+        p.month, p.score, p.evaluation,
+        p.evaluator_id as evaluatorId, admin.real_name as evaluatorName
+        FROM performance p
+        LEFT JOIN employee e ON p.employee_id = e.id
+        LEFT JOIN employee admin ON p.evaluator_id = admin.id
+        <where>
+            <if test="employeeId != null">
+                AND p.employee_id = #{employeeId}
+            </if>
+            <if test="employeeName != null and employeeName != ''">
+                AND e.real_name LIKE '%' || #{employeeName} || '%'
+            </if>
+            <if test="empNo != null and empNo != ''">
+                AND e.emp_no LIKE '%' || #{empNo} || '%'
+            </if>
+            <if test="month != null and month != ''">
+                AND p.month = #{month}
+            </if>
+        </where>
+        ORDER BY p.month DESC, p.employee_id ASC
+    </select>
+    <select id="getById" resultType="com.example.hotel_back.Pojo.Entity.Performance">
+        SELECT * FROM performance WHERE id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.example.hotel_back.Pojo.Entity.Performance">
+        UPDATE performance
+        <set>
+            <if test="score != null">
+                score = #{score},
+            </if>
+            <if test="evaluation != null and evaluation != ''">
+                evaluation = #{evaluation},
+            </if>
+            <if test="evaluatorId != null">
+                evaluator_id = #{evaluatorId},
+            </if>
+            update_time = SYSDATE
+        </set>
+        WHERE id = #{id}
+    </update>
+</mapper>

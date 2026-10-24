@@ -1,0 +1,60 @@
+server:
+  port: 8080
+spring:
+  servlet:
+    multipart:
+      location:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+#  datasource:
+#    driver-class-name: ${hotel.datasource.driver-class-name}
+#    url: jdbc:mysql://${hotel.datasource.host}:${hotel.datasource.port}/${hotel.datasource.database}
+#    username: ${hotel.datasource.username}
+#    password: ${hotel.datasource.password}
+  datasource:
+    driver-class-name: ${hotel.datasource.driver-class-name}
+    url: jdbc:oracle:thin:@${hotel.datasource.host}:${hotel.datasource.port}:${hotel.datasource.sid}
+    username: ${hotel.datasource.username}
+    password: ${hotel.datasource.password}
+#  redis:
+#    host: ${hotel.redis.host}
+#    port: ${hotel.redis.port}
+#    password: ${hotel.redis.password}
+#    database: ${hotel.redis.database}
+mybatis:
+  # mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.hotel_back.Pojo.Entity
+  configuration:
+    # 开启驼峰命名
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com:
+      hotel:
+        mapper: debug
+        service: debug
+        controller: info
+hotel:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: wx2004081429112911
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+    user-secret-key: wx200408142911
+    user-ttl: 7200000
+    user-token-name: token
+# 文件上传配置
+file:
+  # 文件上传本地存储路径
+  upload-path: D:/2025.4.3hotel/upload
+  # 文件访问URL前缀
+  access-url: /upload
+
+
+

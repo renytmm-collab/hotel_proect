@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.ExpenseRecordMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.ExpenseRecordVO">
+        SELECT er.id, er.amount, er.type, er.payment_method as paymentMethod,
+        er.operator_id as operatorId,
+        e.real_name as operatorName, er.remark, er.create_time as createTime
+        FROM expense_record er
+        LEFT JOIN employee e ON er.operator_id = e.id
+        <where>
+            <if test="type != null">
+                AND er.type = #{type}
+            </if>
+            <if test="startDate != null">
+                AND TRUNC(er.create_time) >=TRUNC(#{startDate,jdbcType=DATE})
+            </if>
+            <if test="endDate != null">
+                AND TRUNC(er.create_time) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+            </if>
+        </where>
+        ORDER BY er.create_time DESC
+    </select>
+    <select id="getById" resultType="com.example.hotel_back.Pojo.Entity.ExpenseRecord">
+        SELECT * FROM expense_record WHERE id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.example.hotel_back.Pojo.Entity.ExpenseRecord">
+        UPDATE expense_record
+        <set>
+            <if test="amount != null">
+                amount = #{amount},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="paymentMethod != null">
+                payment_method = #{paymentMethod},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="operatorId != null">
+                operator_id = #{operatorId},
+            </if>
+            update_time = SYSDATE
+        </set>
+        WHERE id = #{id}
+    </update>
+
+<!--    <insert id="insert" useGeneratedKeys="true" keyProperty="id">-->
+<!--        INSERT INTO expense_record (-->
+<!--            amount, type, payment_method, payment_time,-->
+<!--            operator_id, remark, create_time, update_time-->
+<!--        ) VALUES (-->
+<!--                     #{amount}, #{type}, #{paymentMethod}, #{paymentTime},-->
+<!--                     #{operatorId}, #{remark}, #{createTime}, #{updateTime}-->
+<!--                 )-->
+<!--    </insert>-->
+</mapper>

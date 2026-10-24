@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.hotel_back.mapper.OrderMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.uservo.OrderListVO">
+        SELECT bo.id, bo.order_no, rt.type_name as roomTypeName,
+        bo.room_price as roomPrice, bo.check_in_date ,
+        bo.check_out_date , bo.days, bo.total_amount,
+        bo.status, bo.create_time
+        FROM booking_order bo
+        LEFT JOIN room_type rt ON bo.room_type_id = rt.id
+        WHERE bo.user_id = #{userId}
+        <if test="status != null">
+            AND bo.status = #{status}
+        </if>
+        ORDER BY bo.create_time DESC
+    </select>
+    <select id="getOrderDetail" resultType="com.example.hotel_back.Pojo.VO.uservo.OrderDetailVO">
+        SELECT bo.id, bo.order_no, bo.room_type_id,
+               rt.type_name as roomTypeName, bo.room_price,
+               bo.check_in_date , bo.check_out_date ,
+               bo.days, bo.guest_name , bo.guest_phone ,
+               bo.guest_id_card , bo.total_amount ,
+               bo.status, bo.payment_method, bo.payment_no,
+               bo.create_time
+        FROM booking_order bo
+                 LEFT JOIN room_type rt ON bo.room_type_id = rt.id
+        WHERE bo.id = #{orderId}
+    </select>
+    <select id="pageQueryForReception" resultType="com.example.hotel_back.Pojo.VO.employeevo.ReceptionOrderVO">
+        SELECT bo.id, bo.order_no as orderNo, bo.user_id as userId,
+        bo.room_type_id as roomTypeId, rt.type_name as roomTypeName,
+        bo.check_in_date as checkInDate, bo.check_out_date as checkOutDate,
+        bo.days, bo.guest_name as guestName, bo.guest_phone as guestPhone,
+        bo.total_amount as totalAmount, bo.status, bo.create_time as createTime
+        FROM booking_order bo
+        LEFT JOIN room_type rt ON bo.room_type_id = rt.id
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND bo.order_no LIKE '%' || #{orderNo} || '%'
+            </if>
+            <if test="guestName != null and guestName != ''">
+                AND bo.guest_name LIKE '%' || #{guestName} || '%'
+            </if>
+            <if test="guestPhone != null and guestPhone != ''">
+                AND bo.guest_phone LIKE '%' || #{guestPhone} || '%'
+            </if>
+            <if test="guestIdCard != null and guestIdCard != ''">
+                AND bo.guest_id_card LIKE '%' || #{guestIdCard} || '%'
+            </if>
+            <if test="status != null">
+                AND bo.status = #{status}
+            </if>
+            <if test="checkInDate != null">
+                AND TRUNC(bo.check_in_date) = TRUNC(#{checkInDate,jdbcType=DATE})
+            </if>
+        </where>
+        ORDER BY bo.create_time DESC
+    </select>
+    <select id="getOrderDetailForReception" resultType="com.example.hotel_back.Pojo.VO.employeevo.ReceptionOrderDetailVO">
+        SELECT bo.id, bo.order_no as orderNo, bo.user_id as userId,
+               u.username as username,
+               bo.room_type_id as roomTypeId, rt.type_name as roomTypeName,
+               bo.room_price as roomPrice, bo.check_in_date as checkInDate,
+               bo.check_out_date as checkOutDate, bo.days,
+               bo.guest_name as guestName, bo.guest_phone as guestPhone,
+               bo.guest_id_card as guestIdCard, bo.total_amount as totalAmount,
+               bo.status, bo.payment_method as paymentMethod,
+               bo.payment_time as paymentTime, bo.payment_no as paymentNo,
+               bo.create_time as createTime
+        FROM booking_order bo
+                 LEFT JOIN room_type rt ON bo.room_type_id = rt.id
+                 LEFT JOIN USERS u ON bo.user_id = u.id
+        WHERE bo.id = #{id}
+    </select>
+    <select id="countBookedRoomsExcludeOrder" resultType="int">
+        SELECT COUNT(*)
+        FROM booking_order
+        WHERE room_type_id = #{roomTypeId}
+          AND id != #{orderId}
+          AND status IN (1, 2, 3)
+          AND (
+            (TRUNC(check_in_date) &lt;= TRUNC(#{checkOutDate, jdbcType=DATE}) AND TRUNC(check_out_date) &gt; TRUNC(#{checkInDate, jdbcType=DATE}))
+                OR
+            (TRUNC(check_in_date) &lt; TRUNC(#{checkOutDate, jdbcType=DATE}) AND TRUNC(check_out_date) &gt;= TRUNC(#{checkOutDate, jdbcType=DATE}))
+                OR
+            (TRUNC(check_in_date) &lt;= TRUNC(#{checkInDate, jdbcType=DATE}) AND TRUNC(check_out_date) &gt;= TRUNC(#{checkOutDate, jdbcType=DATE}))
+            )
+    </select>
+
+    <update id="updateByReception">
+        UPDATE booking_order
+        <set>
+            <if test="roomTypeId != null">room_type_id = #{roomTypeId},</if>
+            <if test="roomPrice != null">room_price = #{roomPrice},</if>
+            <if test="checkInDate != null">check_in_date = #{checkInDate},</if>
+            <if test="checkOutDate != null">check_out_date = #{checkOutDate},</if>
+            <if test="days != null">days = #{days},</if>
+            <if test="guestName != null">guest_name = #{guestName},</if>
+            <if test="guestPhone != null">guest_phone = #{guestPhone},</if>
+            <if test="guestIdCard != null">guest_id_card = #{guestIdCard},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = SYSDATE
+        </set>
+        WHERE id = #{id}
+    </update>
+    <update id="updateCancelStatus">
+        UPDATE booking_order
+        SET status = #{status},
+            cancel_reason = #{cancelReason},
+            cancel_time = SYSDATE,
+            update_time = SYSDATE
+        WHERE id = #{id}
+    </update>
+    <update id="updateStatus">
+        UPDATE booking_order SET status = #{status}, update_time = SYSDATE WHERE id = #{id}
+    </update>
+</mapper>

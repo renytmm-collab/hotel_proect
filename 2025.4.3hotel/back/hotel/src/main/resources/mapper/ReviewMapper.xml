@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.hotel_back.mapper.ReviewMapper">
+    <select id="pageQueryByUserId" resultType="com.example.hotel_back.Pojo.VO.uservo.ReviewListVO">
+        SELECT r.id, r.content, r.score, r.is_anonymous as isAnonymous,
+               rt.type_name as roomTypeName, r.order_id as orderId,
+               r.create_time as createTime, r.reply, r.reply_time as replyTime
+        FROM review r
+                 LEFT JOIN room_type rt ON r.room_type_id = rt.id
+        WHERE r.user_id = #{userId}
+        ORDER BY r.create_time DESC
+    </select>
+
+    <select id="getByRoomTypeId" resultType="com.example.hotel_back.Pojo.VO.uservo.ReviewVO">
+        SELECT r.id, r.content, r.score, r.create_time as createTime,
+               r.reply, r.reply_time as replyTime, r.is_anonymous as isAnonymous,
+               r.user_id as userId
+        FROM review r
+        WHERE r.room_type_id = #{roomTypeId}
+          AND r.status = 1
+        ORDER BY r.create_time DESC
+    </select>
+
+    <update id="updateReply">
+        UPDATE review
+        SET reply = #{reply},
+            reply_time = SYSDATE,
+            update_time = SYSDATE
+        WHERE id = #{id}
+    </update>
+
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.uservo.ReviewVO">
+        SELECT r.id, r.content, r.score, r.is_anonymous as isAnonymous,
+        rt.type_name as roomTypeName, r.order_id as orderId,
+        r.create_time as createTime, r.reply, r.reply_time as replyTime
+        FROM review r
+        LEFT JOIN room_type rt ON r.room_type_id = rt.id
+        <where>
+            r.status = 1 <!-- 只查询显示状态的评价 -->
+            <if test="roomTypeId != null">
+                AND r.room_type_id = #{roomTypeId}
+            </if>
+        </where>
+        ORDER BY r.create_time DESC
+    </select>
+</mapper>

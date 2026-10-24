@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.GuestMapper">
+    <select id="getGuestStayRecords" resultType="com.example.hotel_back.Pojo.VO.employeevo.GuestStayRecordVO">
+        SELECT
+            ci.id,
+            ci.order_id as orderId,
+            bo.order_no as orderNo,
+            r.room_number as roomNumber,
+            rt.type_name as roomTypeName,
+            ci.check_in_time as checkInTime,
+            ci.check_out_time as checkOutTime,
+            bo.days,
+            NVL(cos.total_fee, 0) as totalAmount
+        FROM check_in_record ci
+                 LEFT JOIN booking_order bo ON ci.order_id = bo.id
+                 LEFT JOIN room r ON ci.room_id = r.id
+                 LEFT JOIN room_type rt ON r.room_type_id = rt.id
+                 LEFT JOIN check_out_settlement cos ON ci.id = cos.check_in_id
+        WHERE ci.guest_id_card = #{guestIdCard}
+        ORDER BY ci.check_in_time DESC
+    </select>
+</mapper>

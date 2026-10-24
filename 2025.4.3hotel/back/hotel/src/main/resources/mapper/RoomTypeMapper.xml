@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.hotel_back.mapper.RoomTypeMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.Entity.RoomType">
+        select * from room_type
+        <where>
+            <if test="typeName != null and typeName != ''">
+                and type_name like '%' || #{typeName} || '%'
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by weight desc, update_time desc
+    </select>
+    <update id="update" parameterType="com.example.hotel_back.Pojo.Entity.RoomType">
+        update room_type
+        <set>
+            <if test="typeName != null">type_name = #{typeName},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="bedType != null">bed_type = #{bedType},</if>
+            <if test="maxGuests != null">max_guests = #{maxGuests},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="facilities != null">facilities = #{facilities},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = SYSDATE
+        </set>
+        where id = #{id}
+    </update>
+    <select id="pageQueryForUser" resultType="com.example.hotel_back.Pojo.VO.uservo.RoomTypeVO">
+        SELECT
+        a.id,
+        a.type_name,
+        a.price,
+        a.area,
+        a.bed_type,
+        a.max_guests,
+        a.description,
+        a.facilities,
+        a.weight,
+        a.status,
+        b.image_url as mainImage
+        FROM
+        room_type a
+        LEFT JOIN
+        (SELECT room_type_id, image_url
+        FROM room_type_image
+        WHERE is_main = 1) b
+        ON a.id = b.room_type_id
+        WHERE a.status = 1
+        <if test="roomTypeId != null">
+            AND a.id = #{roomTypeId}
+        </if>
+        <if test="minPrice != null">
+            AND a.price >= #{minPrice}
+        </if>
+        <if test="maxPrice != null">
+            AND a.price &lt;= #{maxPrice}
+        </if>
+        <if test="maxGuests != null">
+            AND a.max_guests >= #{maxGuests}
+        </if>
+        ORDER BY a.weight DESC, a.id ASC
+    </select>
+    <select id="getHotRoomTypes" resultType="com.example.hotel_back.Pojo.VO.uservo.HotRoomTypeVO">
+        SELECT
+        t.id as id,
+        t.type_name as typeName,
+        t.price as price,
+        t.area as area,
+        t.bed_type as bedType,
+        t.max_guests as maxGuests,
+        t.description as description,
+        i.image_url as mainImage
+        FROM
+        (SELECT * FROM room_type
+        WHERE status = 1
+        ORDER BY weight DESC, id ASC) t
+        LEFT JOIN
+        (SELECT room_type_id, MIN(image_url) as image_url
+        FROM (SELECT room_type_id, image_url
+        FROM room_type_image
+        ORDER BY is_main DESC, id ASC)
+        GROUP BY room_type_id) i
+        ON t.id = i.room_type_id
+        WHERE ROWNUM &lt;= #{limit}
+    </select>
+
+    <select id="getAllRoomTypes" resultType="com.example.hotel_back.Pojo.VO.RoomTypeNameVO">
+        SELECT
+            id,
+            type_name
+        FROM room_type
+        WHERE status = 1
+        ORDER BY id ASC
+    </select>
+</mapper>

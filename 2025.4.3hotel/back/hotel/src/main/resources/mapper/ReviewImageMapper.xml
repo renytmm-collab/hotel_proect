@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.hotel_back.mapper.ReviewImageMapper">
+    <select id="getImagesByReviewIds" resultType="com.example.hotel_back.Pojo.Entity.ReviewImage">
+        SELECT id, review_id as "reviewId", image_url as "imageUrl", create_time as "createTime"
+        FROM review_image
+        WHERE review_id IN
+        <foreach collection="list" item="reviewId" open="(" separator="," close=")">
+            #{reviewId}
+        </foreach>
+    </select>
+
+    <select id="getByReviewIds" resultType="java.util.Map">
+        SELECT review_id as "reviewId", image_url as "imageUrl"
+        FROM review_image
+        WHERE review_id IN
+        <foreach collection="list" item="reviewId" open="(" separator="," close=")">
+            #{reviewId}
+        </foreach>
+    </select>
+</mapper>

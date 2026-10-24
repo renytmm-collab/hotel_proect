@@ -7,6 +7,7 @@ import com.example.hotel_back.Pojo.Entity.Role;
 import com.example.hotel_back.Pojo.VO.RoleNameVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -34,8 +35,9 @@ public interface RoleMapper {
      * 添加角色
      * @param role 角色信息
      */
-    @Insert("insert into role (id, role_name, description, status, create_time, update_time) " +
-            "values (ROLE_SEQ.nextval, #{roleName}, #{description}, #{status}, SYSDATE, SYSDATE)")
+    @Insert("insert into role (role_name, description, status, create_time, update_time) " +
+            "values (#{roleName}, #{description}, #{status}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(Role role);
 

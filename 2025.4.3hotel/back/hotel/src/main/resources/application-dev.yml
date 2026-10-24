@@ -1,23 +1,10 @@
-
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    host: localhost
-#    port: 3306
-#    database: hotel
-#    username: root
-#    password: root
-#  redis:
-#    host: localhost
-#    port: 6379
-#    password: 123456
-#    database: 10
+# MySQL uses independent keys so legacy Oracle DB_* values cannot leak into this connection.
+# Set MYSQL_* via environment variables or the ignored application-local.yml.
 hotel:
-    datasource:
-      driver-class-name: oracle.jdbc.OracleDriver
-      host: 49.140.57.249
-      port: 1521
-      sid: orcl  # 替换为你的 Oracle SID
-      username: zlw
-      password: 123
-
-
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: ${MYSQL_HOST:127.0.0.1}
+    port: ${MYSQL_PORT:3306}
+    database: ${MYSQL_DATABASE:hotel}
+    username: ${MYSQL_USERNAME:}
+    password: ${MYSQL_PASSWORD:}

@@ -15,8 +15,9 @@ public interface IncomeRecordMapper {
      * 添加收入记录
      * @param incomeRecord 收入记录
      */
-    @Insert("INSERT INTO income_record (id, order_id, amount, type, payment_method, payment_time, operator_id, remark, create_time) " +
-            "VALUES (income_record_seq.nextval, #{orderId}, #{amount}, #{type}, #{paymentMethod},SYSDATE, #{operatorId}, #{remark}, SYSDATE)")
+    @Insert("INSERT INTO income_record (order_id, amount, type, payment_method, payment_time, operator_id, remark, create_time) " +
+            "VALUES (#{orderId}, #{amount}, #{type}, #{paymentMethod},NOW(), #{operatorId}, #{remark}, NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(IncomeRecord incomeRecord);
     /**
      * 分页查询收入记录

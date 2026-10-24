@@ -5,7 +5,7 @@
         select * from room_type
         <where>
             <if test="typeName != null and typeName != ''">
-                and type_name like '%' || #{typeName} || '%'
+                and type_name like CONCAT('%', #{typeName}, '%')
             </if>
             <if test="status != null">
                 and status = #{status}
@@ -25,7 +25,7 @@
             <if test="facilities != null">facilities = #{facilities},</if>
             <if test="weight != null">weight = #{weight},</if>
             <if test="status != null">status = #{status},</if>
-            update_time = SYSDATE
+            update_time = NOW()
         </set>
         where id = #{id}
     </update>
@@ -74,18 +74,19 @@
         t.max_guests as maxGuests,
         t.description as description,
         i.image_url as mainImage
-        FROM
-        (SELECT * FROM room_type
-        WHERE status = 1
-        ORDER BY weight DESC, id ASC) t
-        LEFT JOIN
-        (SELECT room_type_id, MIN(image_url) as image_url
-        FROM (SELECT room_type_id, image_url
-        FROM room_type_image
-        ORDER BY is_main DESC, id ASC)
-        GROUP BY room_type_id) i
-        ON t.id = i.room_type_id
-        WHERE ROWNUM &lt;= #{limit}
+        FROM room_type t
+        LEFT JOIN (
+            SELECT room_type_id, image_url
+            FROM (
+                SELECT room_type_id, image_url,
+                       ROW_NUMBER() OVER (PARTITION BY room_type_id ORDER BY is_main DESC, id ASC) AS rn
+                FROM room_type_image
+            ) ranked_images
+            WHERE rn = 1
+        ) i ON t.id = i.room_type_id
+        WHERE t.status = 1
+        ORDER BY t.weight DESC, t.id ASC
+        LIMIT #{limit}
     </select>
 
     <select id="getAllRoomTypes" resultType="com.example.hotel_back.Pojo.VO.RoomTypeNameVO">

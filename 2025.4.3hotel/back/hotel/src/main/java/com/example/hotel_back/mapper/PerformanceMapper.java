@@ -18,8 +18,9 @@ public interface PerformanceMapper {
      * 添加绩效记录
      * @param performance 绩效记录
      */
-    @Insert("INSERT INTO performance (id, employee_id, month, score, evaluation, evaluator_id, create_time, update_time) " +
-            "VALUES (PERFORMANCE_SEQ.nextval, #{employeeId}, #{month}, #{score}, #{evaluation}, #{evaluatorId}, SYSDATE, SYSDATE)")
+    @Insert("INSERT INTO performance (employee_id, month, score, evaluation, evaluator_id, create_time, update_time) " +
+            "VALUES (#{employeeId}, #{month}, #{score}, #{evaluation}, #{evaluatorId}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(Performance performance);
     

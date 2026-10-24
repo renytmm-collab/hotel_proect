@@ -8,10 +8,10 @@
         <where>
             employee_id = #{id}
             <if test="startDate != null">
-                AND TRUNC(ATTENDANCE_DATE) >= TRUNC(#{startDate,jdbcType=DATE})
+                AND ATTENDANCE_DATE >= DATE(#{startDate,jdbcType=DATE})
             </if>
             <if test="endDate != null">
-                AND TRUNC(ATTENDANCE_DATE) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+                AND ATTENDANCE_DATE &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
             </if>
             <if test="status != null">
                 AND status = #{status}
@@ -29,19 +29,19 @@
                 AND a.employee_id = #{employeeId}
             </if>
             <if test="employeeName != null and employeeName != ''">
-                AND e.real_name LIKE '%' || #{employeeName} || '%'
+                AND e.real_name LIKE CONCAT('%', #{employeeName}, '%')
             </if>
             <if test="date != null">
-                AND TRUNC(a.ATTENDANCE_DATE) = TRUNC(#{date,jdbcType=DATE})
+                AND (a.ATTENDANCE_DATE >= DATE(#{date,jdbcType=DATE}) AND a.ATTENDANCE_DATE &lt; DATE_ADD(DATE(#{date,jdbcType=DATE}), INTERVAL 1 DAY))
             </if>
             <if test="status != null">
                 AND a.status = #{status}
             </if>
             <if test="startDate != null">
-                AND TRUNC(a.ATTENDANCE_DATE) >= TRUNC(#{startDate,jdbcType=DATE})
+                AND a.ATTENDANCE_DATE >= DATE(#{startDate,jdbcType=DATE})
             </if>
             <if test="endDate != null">
-                AND TRUNC(a.ATTENDANCE_DATE)&lt;= TRUNC(#{endDate,jdbcType=DATE})
+                AND a.ATTENDANCE_DATE &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
             </if>
         </where>
         ORDER BY a.ATTENDANCE_DATE DESC, a.employee_id ASC
@@ -53,7 +53,7 @@
     <update id="updateStatus">
         UPDATE attendance
         SET status = #{status},
-            update_time = SYSDATE
+            update_time = NOW()
         WHERE id = #{id}
     </update>
 </mapper>

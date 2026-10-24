@@ -15,20 +15,20 @@
         LEFT JOIN booking_order bo ON cos.order_id = bo.id
         LEFT JOIN room r ON cos.room_id = r.id
         LEFT JOIN room_type rt ON r.room_type_id = rt.id
-        LEFT JOIN USERS u ON cos.user_id = u.id
+        LEFT JOIN users u ON cos.user_id = u.id
         LEFT JOIN employee e ON cos.operator_id = e.id
         <where>
             <if test="orderNo != null and orderNo != ''">
-                AND bo.order_no LIKE '%' || #{orderNo} || '%'
+                AND bo.order_no LIKE CONCAT('%', #{orderNo}, '%')
             </if>
             <if test="guestName != null and guestName != ''">
-                AND ci.guest_name LIKE '%' || #{guestName} || '%'
+                AND ci.guest_name LIKE CONCAT('%', #{guestName}, '%')
             </if>
             <if test="startDate != null">
-                AND TRUNC(cos.create_time) >= TRUNC(#{startDate,jdbcType=DATE})
+                AND cos.create_time >= DATE(#{startDate,jdbcType=DATE})
             </if>
             <if test="endDate != null">
-                AND TRUNC(cos.create_time) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+                AND cos.create_time &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
             </if>
         </where>
         ORDER BY cos.create_time DESC
@@ -47,7 +47,7 @@
                  LEFT JOIN booking_order bo ON cos.order_id = bo.id
                  LEFT JOIN room r ON cos.room_id = r.id
                  LEFT JOIN room_type rt ON r.room_type_id = rt.id
-                 LEFT JOIN USERS u ON cos.user_id = u.id
+                 LEFT JOIN users u ON cos.user_id = u.id
                  LEFT JOIN employee e ON cos.operator_id = e.id
         WHERE cos.id = #{id}
     </select>

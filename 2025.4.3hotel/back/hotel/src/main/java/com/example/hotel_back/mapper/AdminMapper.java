@@ -6,6 +6,7 @@ import com.example.hotel_back.Pojo.DAO.EmployeePageQueryDTO;
 import com.example.hotel_back.Pojo.Entity.Employee;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -25,9 +26,10 @@ public interface AdminMapper {
     Employee getByPhone(String phone);
 
 
-    @Insert("insert into employee (id, real_name, password, phone, sex, emp_no, create_time, update_time, status, role_id) " +
+    @Insert("insert into employee (real_name, password, phone, sex, emp_no, create_time, update_time, status, role_id) " +
             "values " +
-            "(employee_seq.nextval, #{realName}, #{password}, #{phone}, #{sex}, #{empNo}, SYSDATE, SYSDATE, #{status}, #{roleId})")
+            "(#{realName}, #{password}, #{phone}, #{sex}, #{empNo}, NOW(), NOW(), #{status}, #{roleId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(Employee employee);
 

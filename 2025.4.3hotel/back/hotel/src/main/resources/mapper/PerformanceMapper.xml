@@ -18,10 +18,10 @@
                 AND p.employee_id = #{employeeId}
             </if>
             <if test="employeeName != null and employeeName != ''">
-                AND e.real_name LIKE '%' || #{employeeName} || '%'
+                AND e.real_name LIKE CONCAT('%', #{employeeName}, '%')
             </if>
             <if test="empNo != null and empNo != ''">
-                AND e.emp_no LIKE '%' || #{empNo} || '%'
+                AND e.emp_no LIKE CONCAT('%', #{empNo}, '%')
             </if>
             <if test="month != null and month != ''">
                 AND p.month = #{month}
@@ -45,7 +45,7 @@
             <if test="evaluatorId != null">
                 evaluator_id = #{evaluatorId},
             </if>
-            update_time = SYSDATE
+            update_time = NOW()
         </set>
         WHERE id = #{id}
     </update>

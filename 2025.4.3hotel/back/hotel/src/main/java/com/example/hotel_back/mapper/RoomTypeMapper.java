@@ -36,8 +36,9 @@ public interface RoomTypeMapper {
      * 添加房型
      * @param roomType 房型信息
      */
-    @Insert("insert into room_type (id, type_name, price, area, bed_type, max_guests, description, facilities, weight, status, create_time, update_time) " +
-            "values (ROOM_TYPE_SEQ.nextval, #{typeName}, #{price}, #{area}, #{bedType}, #{maxGuests}, #{description}, #{facilities}, #{weight}, #{status}, SYSDATE, SYSDATE)")
+    @Insert("insert into room_type (type_name, price, area, bed_type, max_guests, description, facilities, weight, status, create_time, update_time) " +
+            "values (#{typeName}, #{price}, #{area}, #{bedType}, #{maxGuests}, #{description}, #{facilities}, #{weight}, #{status}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(RoomType roomType);
     /**
@@ -57,8 +58,9 @@ public interface RoomTypeMapper {
      * 添加房型图片
      * @param roomTypeImage 图片信息
      */
-    @Insert("insert into room_type_image (id, room_type_id, image_url, is_main, create_time, UPDATE_TIME) " +
-            "values (ROOM_TYPE_IMAGE_SEQ.nextval, #{roomTypeId}, #{imageUrl}, #{isMain}, SYSDATE, SYSDATE)")
+    @Insert("insert into room_type_image (room_type_id, image_url, is_main, create_time, UPDATE_TIME) " +
+            "values (#{roomTypeId}, #{imageUrl}, #{isMain}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insertImage(RoomTypeImage roomTypeImage);
     /**
@@ -105,7 +107,7 @@ public interface RoomTypeMapper {
      * @param roomTypeId 房型ID
      * @param weight 权重值
      */
-    @Update("UPDATE room_type SET weight = #{weight}, update_time = SYSDATE WHERE id = #{roomTypeId}")
+    @Update("UPDATE room_type SET weight = #{weight}, update_time = NOW() WHERE id = #{roomTypeId}")
     void updateWeight(@Param("roomTypeId") Long roomTypeId, @Param("weight") Integer weight);
     /**
      * 根据房型ID查询图片

@@ -8,6 +8,7 @@ import com.example.hotel_back.Pojo.VO.employeevo.CheckInDetailVO;
 import com.example.hotel_back.Pojo.VO.employeevo.CheckInListVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,11 @@ public interface CheckInMapper {
      * 添加入住记录
      * @param checkIn 入住记录
      */
-    @Insert("INSERT INTO check_in_record (id, order_id, room_id, user_id, guest_name, guest_phone, guest_id_card, " +
+    @Insert("INSERT INTO check_in_record (order_id, room_id, user_id, guest_name, guest_phone, guest_id_card, " +
             "check_in_time, check_out_date, deposit, status, remark, operator_id, create_time, update_time) " +
-            "VALUES (CHECK_IN_RECORD_SEQ.nextval, #{orderId}, #{roomId}, #{userId}, #{guestName}, #{guestPhone}, #{guestIdCard}, " +
-            "#{checkInTime}, #{checkOutDate}, #{deposit}, #{status}, #{remark}, #{operatorId}, SYSDATE, SYSDATE)")
+            "VALUES (#{orderId}, #{roomId}, #{userId}, #{guestName}, #{guestPhone}, #{guestIdCard}, " +
+            "#{checkInTime}, #{checkOutDate}, #{deposit}, #{status}, #{remark}, #{operatorId}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value=OperationTypeConstant.INSERT)
     void insert(CheckIn checkIn);
     /**

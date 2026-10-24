@@ -28,8 +28,9 @@ public interface RoomMapper {
      * 添加房间
      * @param room 房间信息
      */
-    @Insert("insert into room (id, room_number, room_type_id, floor, status, create_time, update_time) " +
-            "values (room_seq.nextval, #{roomNumber}, #{roomTypeId}, #{floor}, #{status}, SYSDATE, SYSDATE)")
+    @Insert("insert into room (room_number, room_type_id, floor, status, create_time, update_time) " +
+            "values (#{roomNumber}, #{roomTypeId}, #{floor}, #{status}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(Room room);
     /**
@@ -44,7 +45,7 @@ public interface RoomMapper {
      * 更新房间状态
      * @param room 房间信息
      */
-    @Update("update room set status = #{status}, update_time = SYSDATE where id = #{id}")
+    @Update("update room set status = #{status}, update_time = NOW() where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void updateStatus(Room room);
     /**
@@ -83,7 +84,7 @@ public interface RoomMapper {
      * @param roomId 房间ID
      * @return 入住信息
      */
-    @MapKey("checkInTime")
+
     Map<String, Object> getCurrentCheckInInfo(Long roomId);
 
 

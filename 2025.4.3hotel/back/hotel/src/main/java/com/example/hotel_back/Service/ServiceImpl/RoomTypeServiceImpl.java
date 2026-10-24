@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -196,12 +195,10 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 
             // 手动处理图片映射，避免空键和类型转换问题
             for (Map<String, Object> imageMap : reviewImagesList) {
-                // 处理Oracle返回的BigDecimal转为Long
+                // JDBC drivers may return different Number implementations.
                 Long reviewId = null;
-                if (imageMap.get("reviewId") instanceof BigDecimal) {
-                    reviewId = ((BigDecimal) imageMap.get("reviewId")).longValue();
-                } else if (imageMap.get("reviewId") instanceof Long) {
-                    reviewId = (Long) imageMap.get("reviewId");
+                if (imageMap.get("reviewId") instanceof Number) {
+                    reviewId = ((Number) imageMap.get("reviewId")).longValue();
                 }
 
                 String imageUrl = (String) imageMap.get("imageUrl");
@@ -225,12 +222,10 @@ public class RoomTypeServiceImpl implements RoomTypeService {
             if (!userIds.isEmpty()) {
                 List<Map<String, Object>> userInfoList = userMapper.getByUserIds(userIds);
                 for (Map<String, Object> userInfo : userInfoList) {
-                    // 处理Oracle返回的BigDecimal转为Long
+                    // JDBC drivers may return different Number implementations.
                     Long userId = null;
-                    if (userInfo.get("id") instanceof BigDecimal) {
-                        userId = ((BigDecimal) userInfo.get("id")).longValue();
-                    } else if (userInfo.get("id") instanceof Long) {
-                        userId = (Long) userInfo.get("id");
+                    if (userInfo.get("id") instanceof Number) {
+                        userId = ((Number) userInfo.get("id")).longValue();
                     }
 
                     if (userId != null) {

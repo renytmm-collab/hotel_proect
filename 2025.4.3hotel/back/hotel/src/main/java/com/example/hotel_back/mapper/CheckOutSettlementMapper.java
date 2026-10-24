@@ -17,12 +17,13 @@ public interface CheckOutSettlementMapper {
      * 添加退房结算记录
      * @param settlement 结算记录
      */
-    @Insert("INSERT INTO check_out_settlement (id, check_in_id, order_id, room_id, user_id, " +
+    @Insert("INSERT INTO check_out_settlement (check_in_id, order_id, room_id, user_id, " +
             "extra_fee, damage_fee, total_fee, deposit_refund, payment_method, " +
             "operator_id, remark, create_time, update_time) " +
-            "VALUES (CHECK_OUT_SETTLEMENT_SEQ.nextval, #{checkInId}, #{orderId}, #{roomId}, #{userId}, " +
+            "VALUES (#{checkInId}, #{orderId}, #{roomId}, #{userId}, " +
             "#{extraFee}, #{damageFee}, #{totalFee}, #{depositRefund}, #{paymentMethod}, " +
-            "#{operatorId}, #{remark}, SYSDATE, SYSDATE)")
+            "#{operatorId}, #{remark}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value= OperationTypeConstant.INSERT)
     void insert(CheckOutSettlement settlement);
     /**

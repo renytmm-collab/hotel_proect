@@ -12,7 +12,8 @@ public interface FavoriteMapper {
      * 添加收藏
      * @param favorite 收藏信息
      */
-    @Insert("INSERT INTO favorite (id, user_id, room_type_id, create_time) VALUES (FAVORITE_SEQ.nextval, #{userId}, #{roomTypeId}, SYSDATE)")
+    @Insert("INSERT INTO favorite (user_id, room_type_id, create_time) VALUES (#{userId}, #{roomTypeId}, NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Favorite favorite);
     
     /**

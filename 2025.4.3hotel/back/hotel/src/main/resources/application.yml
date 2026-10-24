@@ -1,6 +1,10 @@
 server:
-  port: 8080
+  port: 8081
 spring:
+  # 加载本地私有配置：application-local.yml 已被 .gitignore 忽略，
+  # optional: 前缀保证文件不存在时自动跳过、不报错
+  config:
+    import: optional:classpath:application-local.yml
   servlet:
     multipart:
       location:
@@ -8,14 +12,9 @@ spring:
     active: dev
   main:
     allow-circular-references: true
-#  datasource:
-#    driver-class-name: ${hotel.datasource.driver-class-name}
-#    url: jdbc:mysql://${hotel.datasource.host}:${hotel.datasource.port}/${hotel.datasource.database}
-#    username: ${hotel.datasource.username}
-#    password: ${hotel.datasource.password}
   datasource:
     driver-class-name: ${hotel.datasource.driver-class-name}
-    url: jdbc:oracle:thin:@${hotel.datasource.host}:${hotel.datasource.port}:${hotel.datasource.sid}
+    url: jdbc:mysql://${hotel.datasource.host}:${hotel.datasource.port}/${hotel.datasource.database}?connectionTimeZone=GMT%2B8&forceConnectionTimeZoneToSession=true&characterEncoding=UTF-8
     username: ${hotel.datasource.username}
     password: ${hotel.datasource.password}
 #  redis:

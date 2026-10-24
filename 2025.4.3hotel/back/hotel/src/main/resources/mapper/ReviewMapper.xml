@@ -24,8 +24,8 @@
     <update id="updateReply">
         UPDATE review
         SET reply = #{reply},
-            reply_time = SYSDATE,
-            update_time = SYSDATE
+            reply_time = NOW(),
+            update_time = NOW()
         WHERE id = #{id}
     </update>
 

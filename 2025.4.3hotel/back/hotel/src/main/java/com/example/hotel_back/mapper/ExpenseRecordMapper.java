@@ -7,6 +7,7 @@ import com.example.hotel_back.Pojo.Entity.ExpenseRecord;
 import com.example.hotel_back.Pojo.VO.ExpenseRecordVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -18,8 +19,9 @@ public interface ExpenseRecordMapper {
      * @param expenseRecord 支出记录
      */
     @AutoFill(value = OperationTypeConstant.INSERT)
-    @Insert("INSERT INTO expense_record (id, amount, type, payment_method, operator_id, remark, create_time, update_time) " +
-            "VALUES (expense_record_seq.nextval, #{amount}, #{type}, #{paymentMethod}, #{operatorId}, #{remark}, SYSDATE, SYSDATE)")
+    @Insert("INSERT INTO expense_record (amount, type, payment_method, operator_id, remark, create_time, update_time) " +
+            "VALUES (#{amount}, #{type}, #{paymentMethod}, #{operatorId}, #{remark}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(ExpenseRecord expenseRecord);
     /**
      * 分页查询支出记录

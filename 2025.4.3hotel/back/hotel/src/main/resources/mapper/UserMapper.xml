@@ -2,18 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.hotel_back.mapper.UserMapper">
     <update id="updateUser" parameterType="User">
-        update USERS
+        update users
         <set>
             <if test="username != null">username = #{username},</if>
             <if test="phone != null">phone = #{phone},</if>
             <if test="avatar != null">avatar = #{avatar},</if>
             <if test="sex != null">sex = #{sex},</if>
-            update_time = SYSDATE
+            update_time = NOW()
         </set>
         where id = #{id}
     </update>
     <select id="getByUserIds" resultType="java.util.Map">
-        SELECT id as "id", username as "username", avatar as "avatar"
+        SELECT id as `id`, username as `username`, avatar as `avatar`
         FROM users
         WHERE id IN
         <foreach collection="list" item="userId" open="(" separator="," close=")">
@@ -21,16 +21,16 @@
         </foreach>
     </select>
     <select id="userPageQuery" resultType="com.example.hotel_back.Pojo.Entity.User">
-        select * from USERS
+        select * from users
         <where>
             <if test="realName != null and realName != ''">
-                "and" real_name like '%' || #{realName} || '%'
+                and real_name like CONCAT('%', #{realName}, '%')
             </if>
             <if test="status != null">
                 and status = #{status}
             </if>
             <if test="phone != null and phone != ''">
-                and phone like '%' || #{phone} || '%'
+                and phone like CONCAT('%', #{phone}, '%')
             </if>
         </where>
         order by create_time desc

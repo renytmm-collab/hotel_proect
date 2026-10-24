@@ -17,7 +17,7 @@ public interface UserMapper {
      * @param phone 手机号
      * @return 用户信息
      */
-    @Select("select * from USERS where phone = #{phone}")
+    @Select("select * from users where phone = #{phone}")
     User getByPhone(String phone);
     
     /**
@@ -25,15 +25,16 @@ public interface UserMapper {
      * @param id 用户ID
      * @return 用户信息
      */
-    @Select("select * from USERS where id = #{id}")
+    @Select("select * from users where id = #{id}")
     User getById(Long id);
     
     /**
      * 添加用户
      * @param user 用户信息
      */
-    @Insert("insert into USERS (id, username, phone, password, status, create_time, update_time) " +
-            "values (user_seq.nextval, #{username}, #{phone}, #{password}, #{status}, SYSDATE, SYSDATE)")
+    @Insert("insert into users (username, phone, password, status, create_time, update_time) " +
+            "values (#{username}, #{phone}, #{password}, #{status}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(User user);
     /**
@@ -46,15 +47,15 @@ public interface UserMapper {
      * 更新用户实名认证信息
      * @param user 用户信息
      */
-    @Update("update USERS set real_name = #{realName}, id_card = #{idCard}, update_time = SYSDATE where id = #{id}")
+    @Update("update users set real_name = #{realName}, id_card = #{idCard}, update_time = NOW() where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void updateRealAuth(User user);
 
-    @Update("update USERS set password = #{password}, update_time = SYSDATE where id = #{id}")
+    @Update("update users set password = #{password}, update_time = NOW() where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void updatePassword(User user);
 
-    @Update("update USERS set status = #{status}, update_time = SYSDATE where id = #{id}")
+    @Update("update users set status = #{status}, update_time = NOW() where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void updateStatus(User user);
     /**

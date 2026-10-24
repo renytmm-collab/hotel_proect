@@ -20,10 +20,11 @@ public interface OrderMapper {
      * 添加订单
      * @param order 订单信息
      */
-    @Insert("insert into booking_order (id, order_no, user_id, room_type_id, room_price, check_in_date, check_out_date, " +
+    @Insert("insert into booking_order (order_no, user_id, room_type_id, room_price, check_in_date, check_out_date, " +
             "days, guest_name, guest_phone, guest_id_card, total_amount, status, create_time, update_time) " +
-            "values (booking_order_seq.nextval, #{orderNo}, #{userId}, #{roomTypeId}, #{roomPrice}, #{checkInDate}, #{checkOutDate}, " +
-            "#{days}, #{guestName}, #{guestPhone}, #{guestIdCard}, #{totalAmount}, #{status}, SYSDATE, SYSDATE)")
+            "values (#{orderNo}, #{userId}, #{roomTypeId}, #{roomPrice}, #{checkInDate}, #{checkOutDate}, " +
+            "#{days}, #{guestName}, #{guestPhone}, #{guestIdCard}, #{totalAmount}, #{status}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(BookingOrder order);
     /**
@@ -43,7 +44,7 @@ public interface OrderMapper {
     @Select("select count(*) from booking_order " +
             "where room_type_id = #{roomTypeId} " +
             "and status in (1, 2, 3) " + // 待支付、已支付待入住、已入住
-            "and not (TRUNC(check_out_date) <= TRUNC(#{checkInDate, jdbcType=DATE}) or TRUNC(check_in_date) >= TRUNC(#{checkOutDate, jdbcType=DATE}))")
+            "and not (check_out_date < DATE_ADD(DATE(#{checkInDate, jdbcType=DATE}), INTERVAL 1 DAY) or check_in_date >= DATE(#{checkOutDate, jdbcType=DATE}))")
     int countBookedRooms(@Param("roomTypeId") Long roomTypeId,
                          @Param("checkInDate") LocalDate checkInDate,
                          @Param("checkOutDate") LocalDate checkOutDate);
@@ -60,7 +61,7 @@ public interface OrderMapper {
      * @param order 订单信息
      */
     @Update("update booking_order set status = #{status}, payment_method = #{paymentMethod}, " +
-            "payment_time =SYSDATE, payment_no = #{paymentNo}, update_time = SYSDATE " +
+            "payment_time =NOW(), payment_no = #{paymentNo}, update_time = NOW() " +
             "where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void updateAfterPayment(BookingOrder order);
@@ -69,7 +70,7 @@ public interface OrderMapper {
      * @param order 订单信息
      */
     @Update("update booking_order set status = #{status}, cancel_reason = #{cancelReason}, " +
-            "cancel_time = SYSDATE, update_time = SYSDATE " +
+            "cancel_time = NOW(), update_time = NOW() " +
             "where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void updateAfterCancel(BookingOrder order);

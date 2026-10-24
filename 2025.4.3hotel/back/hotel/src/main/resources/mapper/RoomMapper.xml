@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.hotel_back.mapper.RoomMapper">
+    <!-- Requires the unique room_number index in db/mysql/schema.sql. Existing rooms stay unchanged. -->
     <insert id="batchInsert" parameterType="java.util.List">
-        <foreach collection="list" item="room" open="BEGIN" close="END;">
-            MERGE INTO room r
-            USING (SELECT #{room.roomNumber} as room_number FROM dual) s
-            ON (r.room_number = s.room_number)
-            WHEN NOT MATCHED THEN
-            INSERT (id, room_number, room_type_id, floor, status, create_time, update_time)
-            VALUES (ROOM_SEQ.nextval, #{room.roomNumber}, #{room.roomTypeId}, #{room.floor}, #{room.status}, SYSDATE, SYSDATE)
+        INSERT INTO room (room_number, room_type_id, floor, status, create_time, update_time)
+        VALUES
+        <foreach collection="list" item="room" separator=",">
+            (#{room.roomNumber}, #{room.roomTypeId}, #{room.floor}, #{room.status}, NOW(), NOW())
         </foreach>
+        ON DUPLICATE KEY UPDATE id = room.id
     </insert>
     <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.RoomVO">
         SELECT r.id, r.room_number, r.room_type_id, rt.type_name as roomTypeName,
@@ -18,7 +17,7 @@
         LEFT JOIN room_type rt ON r.room_type_id = rt.id
         <where>
             <if test="roomNumber != null and roomNumber != ''">
-                AND r.room_number LIKE '%' || #{roomNumber} || '%'
+                AND r.room_number LIKE CONCAT('%', #{roomNumber}, '%')
             </if>
             <if test="roomTypeId != null">
                 AND r.room_type_id = #{roomTypeId}
@@ -61,12 +60,12 @@
     <select id="getCurrentCheckInInfo" resultType="java.util.Map">
         SELECT ci.guest_name as guestName, ci.guest_phone as guestPhone,
                ci.guest_id_card as guestIdCard, ci.check_in_time as checkInTime,
-               ci.check_out_date as checkOutDate
+               CAST(ci.check_out_date AS DATETIME) as checkOutDate
         FROM check_in_record ci
         WHERE ci.room_id = #{roomId}
           AND ci.status = 0
           AND ci.check_out_time IS NULL
-          AND ROWNUM = 1
-        ORDER BY ci.check_in_time DESC
+        ORDER BY ci.check_in_time DESC, ci.id DESC
+        LIMIT 1
     </select>
 </mapper>

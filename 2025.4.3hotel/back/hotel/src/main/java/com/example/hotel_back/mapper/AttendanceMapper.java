@@ -20,22 +20,23 @@ public interface AttendanceMapper {
      * @param date 日期
      * @return 考勤记录
      */
-    @Select("select * from attendance where employee_id = #{employeeId} and ATTENDANCE_DATE = TRUNC(#{date,jdbcType=DATE})")
+    @Select("select * from attendance where employee_id = #{employeeId} and ATTENDANCE_DATE = DATE(#{date,jdbcType=DATE})")
     Attendance getByEmployeeIdAndDate(@Param("employeeId") Long employeeId, @Param("date") LocalDate date);
     
     /**
      * 添加考勤记录
      * @param attendance 考勤记录
      */
-    @Insert("insert into attendance (ID,employee_id, ATTENDANCE_DATE, check_in_time, status, create_time, update_time) " +
-            "values (ATTENDANCE_SEQ.nextval,#{employeeId}, #{date}, #{checkInTime}, #{status}, SYSDATE,SYSDATE)")
+    @Insert("insert into attendance (employee_id, ATTENDANCE_DATE, check_in_time, status, create_time, update_time) " +
+            "values (#{employeeId}, #{date}, #{checkInTime}, #{status}, NOW(),NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(Attendance attendance);
     /**
      * 更新考勤记录
      * @param attendance 考勤记录
      */
-    @Update("update attendance set check_out_time = SYSDATE, status = #{status}, update_time = SYSDATE where id = #{id}")
+    @Update("update attendance set check_out_time = NOW(), status = #{status}, update_time = NOW() where id = #{id}")
     @AutoFill(value = OperationTypeConstant.UPDATE)
     void update(Attendance attendance);
     /**

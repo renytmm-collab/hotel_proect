@@ -6,7 +6,7 @@
         select * from role
         <where>
             <if test="roleName != null and roleName != ''">
-                and role_name like '%' || #{roleName} || '%'
+                and role_name like CONCAT('%', #{roleName}, '%')
             </if>
             <if test="status != null">
                 and status = #{status}
@@ -20,7 +20,7 @@
             <if test="roleName != null">role_name = #{roleName},</if>
             <if test="description != null">description = #{description},</if>
             <if test="status != null">status = #{status},</if>
-            update_time = SYSDATE
+            update_time = NOW()
         </set>
         where id = #{id}
     </update>

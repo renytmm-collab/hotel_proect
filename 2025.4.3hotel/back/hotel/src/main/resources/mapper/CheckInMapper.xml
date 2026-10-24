@@ -13,26 +13,26 @@
         LEFT JOIN booking_order bo ON ci.order_id = bo.id
         LEFT JOIN room r ON ci.room_id = r.id
         LEFT JOIN room_type rt ON r.room_type_id = rt.id
-        LEFT JOIN USERS u ON bo.user_id = u.id
+        LEFT JOIN users u ON bo.user_id = u.id
         LEFT JOIN employee e ON ci.operator_id = e.id
         <where>
             <if test="roomNumber != null and roomNumber != ''">
-                AND r.room_number LIKE '%' || #{roomNumber} || '%'
+                AND r.room_number LIKE CONCAT('%', #{roomNumber}, '%')
             </if>
             <if test="guestName != null and guestName != ''">
-                AND ci.guest_name LIKE '%' || #{guestName} || '%'
+                AND ci.guest_name LIKE CONCAT('%', #{guestName}, '%')
             </if>
             <if test="phone != null and phone != ''">
-                AND ci.guest_phone LIKE '%' || #{phone} || '%'
+                AND ci.guest_phone LIKE CONCAT('%', #{phone}, '%')
             </if>
             <if test="status != null">
                 AND ci.status = #{status}
             </if>
             <if test="startDate != null">
-                AND TRUNC(ci.check_in_time) >= TRUNC(#{startDate,jdbcType=DATE})
+                AND ci.check_in_time >= DATE(#{startDate,jdbcType=DATE})
             </if>
             <if test="endDate != null">
-                AND TRUNC(ci.check_in_time) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+                AND ci.check_in_time &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
             </if>
         </where>
         ORDER BY ci.check_in_time DESC
@@ -50,7 +50,7 @@
                  LEFT JOIN booking_order bo ON ci.order_id = bo.id
                  LEFT JOIN room r ON ci.room_id = r.id
                  LEFT JOIN room_type rt ON r.room_type_id = rt.id
-                 LEFT JOIN USERS u ON bo.user_id = u.id
+                 LEFT JOIN users u ON bo.user_id = u.id
                  LEFT JOIN employee e ON ci.operator_id = e.id
         WHERE ci.id = #{id}
     </select>
@@ -62,7 +62,7 @@
         UPDATE check_in_record
         SET status = #{status},
             check_out_time = #{checkOutTime},
-            update_time = SYSDATE
+            update_time = NOW()
         WHERE id = #{id}
     </update>
 </mapper>

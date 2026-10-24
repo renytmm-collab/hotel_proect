@@ -36,22 +36,22 @@
         LEFT JOIN room_type rt ON bo.room_type_id = rt.id
         <where>
             <if test="orderNo != null and orderNo != ''">
-                AND bo.order_no LIKE '%' || #{orderNo} || '%'
+                AND bo.order_no LIKE CONCAT('%', #{orderNo}, '%')
             </if>
             <if test="guestName != null and guestName != ''">
-                AND bo.guest_name LIKE '%' || #{guestName} || '%'
+                AND bo.guest_name LIKE CONCAT('%', #{guestName}, '%')
             </if>
             <if test="guestPhone != null and guestPhone != ''">
-                AND bo.guest_phone LIKE '%' || #{guestPhone} || '%'
+                AND bo.guest_phone LIKE CONCAT('%', #{guestPhone}, '%')
             </if>
             <if test="guestIdCard != null and guestIdCard != ''">
-                AND bo.guest_id_card LIKE '%' || #{guestIdCard} || '%'
+                AND bo.guest_id_card LIKE CONCAT('%', #{guestIdCard}, '%')
             </if>
             <if test="status != null">
                 AND bo.status = #{status}
             </if>
             <if test="checkInDate != null">
-                AND TRUNC(bo.check_in_date) = TRUNC(#{checkInDate,jdbcType=DATE})
+                AND (bo.check_in_date >= DATE(#{checkInDate,jdbcType=DATE}) AND bo.check_in_date &lt; DATE_ADD(DATE(#{checkInDate,jdbcType=DATE}), INTERVAL 1 DAY))
             </if>
         </where>
         ORDER BY bo.create_time DESC
@@ -69,7 +69,7 @@
                bo.create_time as createTime
         FROM booking_order bo
                  LEFT JOIN room_type rt ON bo.room_type_id = rt.id
-                 LEFT JOIN USERS u ON bo.user_id = u.id
+                 LEFT JOIN users u ON bo.user_id = u.id
         WHERE bo.id = #{id}
     </select>
     <select id="countBookedRoomsExcludeOrder" resultType="int">
@@ -79,11 +79,11 @@
           AND id != #{orderId}
           AND status IN (1, 2, 3)
           AND (
-            (TRUNC(check_in_date) &lt;= TRUNC(#{checkOutDate, jdbcType=DATE}) AND TRUNC(check_out_date) &gt; TRUNC(#{checkInDate, jdbcType=DATE}))
+            (check_in_date &lt; DATE_ADD(DATE(#{checkOutDate, jdbcType=DATE}), INTERVAL 1 DAY) AND check_out_date >= DATE_ADD(DATE(#{checkInDate, jdbcType=DATE}), INTERVAL 1 DAY))
                 OR
-            (TRUNC(check_in_date) &lt; TRUNC(#{checkOutDate, jdbcType=DATE}) AND TRUNC(check_out_date) &gt;= TRUNC(#{checkOutDate, jdbcType=DATE}))
+            (check_in_date &lt; DATE(#{checkOutDate, jdbcType=DATE}) AND check_out_date &gt;= DATE(#{checkOutDate, jdbcType=DATE}))
                 OR
-            (TRUNC(check_in_date) &lt;= TRUNC(#{checkInDate, jdbcType=DATE}) AND TRUNC(check_out_date) &gt;= TRUNC(#{checkOutDate, jdbcType=DATE}))
+            (check_in_date &lt; DATE_ADD(DATE(#{checkInDate, jdbcType=DATE}), INTERVAL 1 DAY) AND check_out_date &gt;= DATE(#{checkOutDate, jdbcType=DATE}))
             )
     </select>
 
@@ -100,7 +100,7 @@
             <if test="guestIdCard != null">guest_id_card = #{guestIdCard},</if>
             <if test="totalAmount != null">total_amount = #{totalAmount},</if>
             <if test="status != null">status = #{status},</if>
-            update_time = SYSDATE
+            update_time = NOW()
         </set>
         WHERE id = #{id}
     </update>
@@ -108,11 +108,11 @@
         UPDATE booking_order
         SET status = #{status},
             cancel_reason = #{cancelReason},
-            cancel_time = SYSDATE,
-            update_time = SYSDATE
+            cancel_time = NOW(),
+            update_time = NOW()
         WHERE id = #{id}
     </update>
     <update id="updateStatus">
-        UPDATE booking_order SET status = #{status}, update_time = SYSDATE WHERE id = #{id}
+        UPDATE booking_order SET status = #{status}, update_time = NOW() WHERE id = #{id}
     </update>
 </mapper>

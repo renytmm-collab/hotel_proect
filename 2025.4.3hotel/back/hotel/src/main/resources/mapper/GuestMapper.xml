@@ -11,7 +11,7 @@
             ci.check_in_time as checkInTime,
             ci.check_out_time as checkOutTime,
             bo.days,
-            NVL(cos.total_fee, 0) as totalAmount
+            IFNULL(cos.total_fee, 0) as totalAmount
         FROM check_in_record ci
                  LEFT JOIN booking_order bo ON ci.order_id = bo.id
                  LEFT JOIN room r ON ci.room_id = r.id

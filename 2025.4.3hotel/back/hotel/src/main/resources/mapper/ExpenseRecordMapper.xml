@@ -12,10 +12,10 @@
                 AND er.type = #{type}
             </if>
             <if test="startDate != null">
-                AND TRUNC(er.create_time) >=TRUNC(#{startDate,jdbcType=DATE})
+                AND er.create_time >= DATE(#{startDate,jdbcType=DATE})
             </if>
             <if test="endDate != null">
-                AND TRUNC(er.create_time) &lt;= TRUNC(#{endDate,jdbcType=DATE})
+                AND er.create_time &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
             </if>
         </where>
         ORDER BY er.create_time DESC
@@ -42,7 +42,7 @@
             <if test="operatorId != null">
                 operator_id = #{operatorId},
             </if>
-            update_time = SYSDATE
+            update_time = NOW()
         </set>
         WHERE id = #{id}
     </update>

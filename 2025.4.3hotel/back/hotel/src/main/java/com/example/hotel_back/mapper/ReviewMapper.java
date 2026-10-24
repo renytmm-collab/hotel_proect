@@ -18,8 +18,9 @@ public interface ReviewMapper {
      * 添加评价
      * @param review 评价信息
      */
-    @Insert("INSERT INTO review (id, user_id, order_id, room_type_id, content, score, is_anonymous, status, create_time, update_time) " +
-            "VALUES (review_seq.nextval, #{userId}, #{orderId}, #{roomTypeId}, #{content}, #{score}, #{isAnonymous}, #{status}, SYSDATE, SYSDATE)")
+    @Insert("INSERT INTO review (user_id, order_id, room_type_id, content, score, is_anonymous, status, create_time, update_time) " +
+            "VALUES (#{userId}, #{orderId}, #{roomTypeId}, #{content}, #{score}, #{isAnonymous}, #{status}, NOW(), NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     @AutoFill(value = OperationTypeConstant.INSERT)
     void insert(Review review);
 

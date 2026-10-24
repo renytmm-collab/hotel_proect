@@ -12,8 +12,9 @@ public interface ReviewImageMapper {
      * 添加评价图片
      * @param reviewImage 评价图片信息
      */
-    @Insert("INSERT INTO review_image (id, review_id, image_url, create_time) " +
-            "VALUES (REVIEW_IMAGE_SEQ.nextval, #{reviewId}, #{imageUrl}, SYSDATE)")
+    @Insert("INSERT INTO review_image (review_id, image_url, create_time) " +
+            "VALUES (#{reviewId}, #{imageUrl}, NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(ReviewImage reviewImage);
 
     /**

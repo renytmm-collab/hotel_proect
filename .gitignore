@@ -32,3 +32,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 本地私有配置（含数据库密码等敏感信息，严禁提交）###
+application-local.yml
+application-local.yaml
+
+# Project-local Maven environment
+/.build-env/

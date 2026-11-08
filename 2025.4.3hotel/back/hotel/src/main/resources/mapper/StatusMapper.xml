@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.StatsMapper">
+    <select id="getRoomSalesStats" resultType="com.example.hotel_back.Pojo.VO.RoomSalesStatVO">
+        SELECT rt.id AS roomTypeId, rt.type_name AS roomTypeName,
+               COUNT(DISTINCT bo.id) AS orderCount, SUM(bo.total_amount) AS totalAmount
+        FROM booking_order bo JOIN room_type rt ON bo.room_type_id = rt.id
+        WHERE bo.status = 4 AND bo.check_in_date >= DATE(#{startDate, jdbcType=DATE}) AND bo.check_in_date &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+        GROUP BY rt.id, rt.type_name
+        ORDER BY totalAmount DESC
+    </select>
+
+    <select id="getRoomCountByType" resultType="int">
+        SELECT COUNT(*) FROM room WHERE room_type_id = #{roomTypeId}
+    </select>
+
+    <select id="getActualOccupancyDays" resultType="int">
+        SELECT IFNULL(SUM(CASE
+            WHEN ci.check_in_time IS NULL OR ci.check_out_time IS NULL THEN 0
+            ELSE DATEDIFF(LEAST(DATE(ci.check_out_time), DATE(#{endDate, jdbcType=DATE})),
+                          GREATEST(DATE(ci.check_in_time), DATE(#{startDate, jdbcType=DATE}))) + 1
+            END), 0) AS occupancyDays
+        FROM check_in_record ci JOIN room r ON ci.room_id = r.id
+        WHERE r.room_type_id = #{roomTypeId}
+          AND ci.check_in_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+          AND (ci.check_out_time IS NULL OR ci.check_out_time >= DATE(#{startDate, jdbcType=DATE}))
+    </select>
+
+    <select id="getIncomeStatsByDay" resultType="com.example.hotel_back.Pojo.VO.IncomeStatVO">
+        SELECT DATE_FORMAT(payment_time, '%Y-%m-%d') AS `date`,
+               SUM(CASE WHEN type = 0 THEN amount ELSE 0 END) AS roomFee,
+               SUM(CASE WHEN type = 1 THEN amount ELSE 0 END) AS depositFee,
+               SUM(CASE WHEN type = 2 THEN amount ELSE 0 END) AS otherFee
+        FROM income_record
+        WHERE payment_time >= DATE(#{startDate, jdbcType=DATE}) AND payment_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+        GROUP BY DATE_FORMAT(payment_time, '%Y-%m-%d')
+        ORDER BY `date` ASC
+    </select>
+
+    <select id="getIncomeStatsByMonth" resultType="com.example.hotel_back.Pojo.VO.IncomeStatVO">
+        SELECT DATE_FORMAT(payment_time, '%Y-%m') AS `date`,
+               SUM(CASE WHEN type = 0 THEN amount ELSE 0 END) AS roomFee,
+               SUM(CASE WHEN type = 1 THEN amount ELSE 0 END) AS depositFee,
+               SUM(CASE WHEN type = 2 THEN amount ELSE 0 END) AS otherFee
+        FROM income_record
+        WHERE payment_time >= DATE(#{startDate, jdbcType=DATE}) AND payment_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+        GROUP BY DATE_FORMAT(payment_time, '%Y-%m')
+        ORDER BY `date` ASC
+    </select>
+
+    <select id="getIncomeStatsByYear" resultType="com.example.hotel_back.Pojo.VO.IncomeStatVO">
+        SELECT DATE_FORMAT(payment_time, '%Y') AS `date`,
+               SUM(CASE WHEN type = 0 THEN amount ELSE 0 END) AS roomFee,
+               SUM(CASE WHEN type = 1 THEN amount ELSE 0 END) AS depositFee,
+               SUM(CASE WHEN type = 2 THEN amount ELSE 0 END) AS otherFee
+        FROM income_record
+        WHERE payment_time >= DATE(#{startDate, jdbcType=DATE}) AND payment_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+        GROUP BY DATE_FORMAT(payment_time, '%Y')
+        ORDER BY `date` ASC
+    </select>
+
+    <select id="getExpenseStatsByMonth" resultType="com.example.hotel_back.Pojo.VO.ExpenseStatVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m') AS `date`,
+               SUM(CASE WHEN type = 0 THEN amount ELSE 0 END) AS refundFee,
+               SUM(CASE WHEN type = 1 THEN amount ELSE 0 END) AS purchaseFee,
+               SUM(CASE WHEN type = 2 THEN amount ELSE 0 END) AS salaryFee,
+               SUM(CASE WHEN type = 3 THEN amount ELSE 0 END) AS utilityFee,
+               SUM(CASE WHEN type = 4 THEN amount ELSE 0 END) AS otherFee
+        FROM expense_record
+        WHERE create_time >= DATE(#{startDate, jdbcType=DATE}) AND create_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m')
+        ORDER BY `date` ASC
+    </select>
+
+    <select id="getExpenseStatsByYear" resultType="com.example.hotel_back.Pojo.VO.ExpenseStatVO">
+        SELECT DATE_FORMAT(create_time, '%Y') AS `date`,
+               SUM(CASE WHEN type = 0 THEN amount ELSE 0 END) AS refundFee,
+               SUM(CASE WHEN type = 1 THEN amount ELSE 0 END) AS purchaseFee,
+               SUM(CASE WHEN type = 2 THEN amount ELSE 0 END) AS salaryFee,
+               SUM(CASE WHEN type = 3 THEN amount ELSE 0 END) AS utilityFee,
+               SUM(CASE WHEN type = 4 THEN amount ELSE 0 END) AS otherFee
+        FROM expense_record
+        WHERE create_time >= DATE(#{startDate, jdbcType=DATE}) AND create_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+        GROUP BY DATE_FORMAT(create_time, '%Y')
+        ORDER BY `date` ASC
+    </select>
+
+    <select id="getProfitStatsByMonth" resultType="com.example.hotel_back.Pojo.VO.ProfitStatVO">
+        WITH RECURSIVE periods AS (
+            SELECT CAST(DATE_FORMAT(DATE(#{startDate, jdbcType=DATE}), '%Y-%m-01') AS DATE) AS period_date
+            WHERE DATE(#{startDate, jdbcType=DATE}) &lt;= DATE(#{endDate, jdbcType=DATE})
+            UNION ALL
+            SELECT DATE_ADD(period_date, INTERVAL 1 MONTH) FROM periods
+            WHERE DATE_ADD(period_date, INTERVAL 1 MONTH) &lt;= DATE(#{endDate, jdbcType=DATE})
+        ), income_data AS (
+            SELECT DATE_FORMAT(payment_time, '%Y-%m') AS period_key, SUM(amount) AS total_income
+            FROM income_record WHERE payment_time >= DATE(#{startDate, jdbcType=DATE}) AND payment_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+            GROUP BY DATE_FORMAT(payment_time, '%Y-%m')
+        ), expense_data AS (
+            SELECT DATE_FORMAT(create_time, '%Y-%m') AS period_key, SUM(amount) AS total_expense
+            FROM expense_record WHERE create_time >= DATE(#{startDate, jdbcType=DATE}) AND create_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+            GROUP BY DATE_FORMAT(create_time, '%Y-%m')
+        )
+        SELECT /*+ SET_VAR(cte_max_recursion_depth=100000) */
+               DATE_FORMAT(p.period_date, '%Y-%m') AS `date`,
+               IFNULL(i.total_income, 0) AS income, IFNULL(e.total_expense, 0) AS expense
+        FROM periods p
+        LEFT JOIN income_data i ON i.period_key = DATE_FORMAT(p.period_date, '%Y-%m')
+        LEFT JOIN expense_data e ON e.period_key = DATE_FORMAT(p.period_date, '%Y-%m')
+        ORDER BY p.period_date ASC
+    </select>
+
+    <select id="getProfitStatsByYear" resultType="com.example.hotel_back.Pojo.VO.ProfitStatVO">
+        WITH RECURSIVE periods AS (
+            SELECT CAST(DATE_FORMAT(DATE(#{startDate, jdbcType=DATE}), '%Y-01-01') AS DATE) AS period_date
+            WHERE DATE(#{startDate, jdbcType=DATE}) &lt;= DATE(#{endDate, jdbcType=DATE})
+            UNION ALL
+            SELECT DATE_ADD(period_date, INTERVAL 1 YEAR) FROM periods
+            WHERE DATE_ADD(period_date, INTERVAL 1 YEAR) &lt;= DATE(#{endDate, jdbcType=DATE})
+        ), income_data AS (
+            SELECT DATE_FORMAT(payment_time, '%Y') AS period_key, SUM(amount) AS total_income
+            FROM income_record WHERE payment_time >= DATE(#{startDate, jdbcType=DATE}) AND payment_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+            GROUP BY DATE_FORMAT(payment_time, '%Y')
+        ), expense_data AS (
+            SELECT DATE_FORMAT(create_time, '%Y') AS period_key, SUM(amount) AS total_expense
+            FROM expense_record WHERE create_time >= DATE(#{startDate, jdbcType=DATE}) AND create_time &lt; DATE_ADD(DATE(#{endDate, jdbcType=DATE}), INTERVAL 1 DAY)
+            GROUP BY DATE_FORMAT(create_time, '%Y')
+        )
+        SELECT /*+ SET_VAR(cte_max_recursion_depth=100000) */
+               DATE_FORMAT(p.period_date, '%Y') AS `date`,
+               IFNULL(i.total_income, 0) AS income, IFNULL(e.total_expense, 0) AS expense
+        FROM periods p
+        LEFT JOIN income_data i ON i.period_key = DATE_FORMAT(p.period_date, '%Y')
+        LEFT JOIN expense_data e ON e.period_key = DATE_FORMAT(p.period_date, '%Y')
+        ORDER BY p.period_date ASC
+    </select>
+
+    <select id="getTotalRoomCount" resultType="int">
+        SELECT COUNT(*) FROM room WHERE status != 0
+    </select>
+
+    <select id="getOccupancyStatsByDay" resultType="com.example.hotel_back.Pojo.VO.OccupancyStatVO">
+        WITH RECURSIVE day_dates AS (
+            SELECT DATE(#{startDate, jdbcType=DATE}) AS full_date WHERE DATE(#{startDate, jdbcType=DATE}) &lt;= DATE(#{endDate, jdbcType=DATE})
+            UNION ALL
+            SELECT DATE_ADD(full_date, INTERVAL 1 DAY) FROM day_dates
+            WHERE full_date &lt; DATE(#{endDate, jdbcType=DATE})
+        )
+        SELECT /*+ SET_VAR(cte_max_recursion_depth=100000) */
+               DATE_FORMAT(dd.full_date, '%Y-%m-%d') AS `date`,
+               (SELECT COUNT(DISTINCT room_id) FROM check_in_record
+                WHERE check_in_time &lt; DATE_ADD(dd.full_date, INTERVAL 1 DAY)
+                  AND (check_out_time IS NULL OR check_out_time >= DATE_ADD(dd.full_date, INTERVAL 1 DAY))) AS occupiedRooms
+        FROM day_dates dd ORDER BY dd.full_date ASC
+    </select>
+</mapper>

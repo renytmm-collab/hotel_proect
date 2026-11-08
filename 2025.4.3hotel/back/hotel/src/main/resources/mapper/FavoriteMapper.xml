@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hotel_back.mapper.FavoriteMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.uservo.FavoriteListVO">
+        SELECT
+        f.id,
+        f.room_type_id as roomTypeId,
+        rt.type_name as typeName,
+        rt.price,
+        rt.bed_type as bedType,
+        rti.image_url as mainImage  <!-- 直接通过JOIN获取主图 -->
+        FROM favorite f
+        LEFT JOIN room_type rt
+        ON f.room_type_id = rt.id
+        <!-- 新增LEFT JOIN获取主图片（is_main=1确保只取主图） -->
+        LEFT JOIN room_type_image rti
+        ON rt.id = rti.room_type_id  <!-- 关联房间类型ID -->
+        AND rti.is_main = 1         <!-- 仅保留主图记录 -->
+        WHERE f.user_id = #{userId}
+        ORDER BY f.create_time DESC
+    </select>
+</mapper>

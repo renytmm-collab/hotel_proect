@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.hotel_back.mapper.AttendanceMapper">
+    <select id="pageQuery" resultType="com.example.hotel_back.Pojo.VO.AttendanceVO">
+        SELECT id, ATTENDANCE_DATE, status
+        FROM attendance
+        <where>
+            employee_id = #{id}
+            <if test="startDate != null">
+                AND ATTENDANCE_DATE >= DATE(#{startDate,jdbcType=DATE})
+            </if>
+            <if test="endDate != null">
+                AND ATTENDANCE_DATE &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY attendance_date DESC
+    </select>
+    <select id="PageQuery" resultType="com.example.hotel_back.Pojo.VO.employeevo.EAttendanceVO">
+        SELECT a.id, a.employee_id as employeeId, e.real_name as employeeName,
+        e.avatar, a.ATTENDANCE_DATE, a.status
+        FROM attendance a
+        LEFT JOIN employee e ON a.employee_id = e.id
+        <where>
+            <if test="employeeId != null">
+                AND a.employee_id = #{employeeId}
+            </if>
+            <if test="employeeName != null and employeeName != ''">
+                AND e.real_name LIKE CONCAT('%', #{employeeName}, '%')
+            </if>
+            <if test="date != null">
+                AND (a.ATTENDANCE_DATE >= DATE(#{date,jdbcType=DATE}) AND a.ATTENDANCE_DATE &lt; DATE_ADD(DATE(#{date,jdbcType=DATE}), INTERVAL 1 DAY))
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+            <if test="startDate != null">
+                AND a.ATTENDANCE_DATE >= DATE(#{startDate,jdbcType=DATE})
+            </if>
+            <if test="endDate != null">
+                AND a.ATTENDANCE_DATE &lt; DATE_ADD(DATE(#{endDate,jdbcType=DATE}), INTERVAL 1 DAY)
+            </if>
+        </where>
+        ORDER BY a.ATTENDANCE_DATE DESC, a.employee_id ASC
+    </select>
+    <select id="getById" resultType="com.example.hotel_back.Pojo.Entity.Attendance">
+        SELECT * FROM attendance WHERE id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE attendance
+        SET status = #{status},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper>

@@ -2,10 +2,10 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import { 
-  House, 
-  User, 
-  Setting, 
+import {
+  House,
+  User,
+  Setting,
   Tickets,
   OfficeBuilding,
   Money,
@@ -13,6 +13,7 @@ import {
   Clock,
   UserFilled,
   Medal,
+  DataAnalysis,
   ArrowDown
 } from '@element-plus/icons-vue'
 
@@ -46,7 +47,7 @@ const handleLogout = () => {
     localStorage.removeItem('staffUsername')
     localStorage.removeItem('staffRole')
     localStorage.removeItem('staffToken')
-    
+
     // 跳转到登录页
     router.push('/login')
   }).catch(() => {})
@@ -70,64 +71,69 @@ const handleCommand = (command) => {
           <div class="logo">
             <h1>酒店管理系统</h1>
           </div>
-          
+
           <el-menu
-            :default-active="activeMenu"
-            mode="horizontal"
-            router
-            class="el-menu-horizontal"
+              :default-active="activeMenu"
+              mode="horizontal"
+              router
+              class="el-menu-horizontal"
           >
             <el-menu-item index="/admin">
               <el-icon><House /></el-icon>
               <span>首页</span>
             </el-menu-item>
-            
+
+            <el-menu-item index="/admin/bigscreen">
+              <el-icon><DataAnalysis /></el-icon>
+              <span>数据大屏</span>
+            </el-menu-item>
+
             <el-menu-item index="/admin/account">
               <el-icon><User /></el-icon>
               <span>账户管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/role">
               <el-icon><Setting /></el-icon>
               <span>角色管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/staff">
               <el-icon><UserFilled /></el-icon>
               <span>员工管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/room-type">
               <el-icon><Tickets /></el-icon>
               <span>房型管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/room">
               <el-icon><OfficeBuilding /></el-icon>
               <span>房间管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/attendance">
               <el-icon><Clock /></el-icon>
               <span>考勤管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/performance">
               <el-icon><Medal /></el-icon>
               <span>绩效管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/finance">
               <el-icon><Money /></el-icon>
               <span>财务管理</span>
             </el-menu-item>
-            
+
             <el-menu-item index="/admin/report">
               <el-icon><Document /></el-icon>
               <span>报表统计</span>
             </el-menu-item>
           </el-menu>
-          
+
           <div class="user-info">
             <el-dropdown @command="handleCommand">
               <span class="el-dropdown-link">
@@ -144,7 +150,7 @@ const handleCommand = (command) => {
           </div>
         </div>
       </el-header>
-      
+
       <el-main>
         <router-view></router-view>
       </el-main>
@@ -251,12 +257,12 @@ const handleCommand = (command) => {
     padding: 0 8px;
     font-size: 13px;
   }
-  
+
   :deep(.el-menu--horizontal>.el-menu-item .el-icon) {
     margin-right: 3px;
     font-size: 14px;
   }
-  
+
   .logo h1 {
     font-size: 14px;
   }
@@ -266,18 +272,18 @@ const handleCommand = (command) => {
   .header-container {
     padding: 0 5px;
   }
-  
+
   .logo h1 {
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   :deep(.el-menu--horizontal>.el-menu-item) {
     padding: 0 6px;
     font-size: 12px;
   }
-  
+
   :deep(.el-menu--horizontal>.el-menu-item .el-icon) {
     margin-right: 2px;
     font-size: 14px;
@@ -288,22 +294,22 @@ const handleCommand = (command) => {
   .logo {
     margin-right: 5px;
   }
-  
+
   .logo h1 {
     font-size: 12px;
     max-width: 80px;
   }
-  
+
   :deep(.el-menu--horizontal>.el-menu-item) {
     padding: 0 4px;
     font-size: 12px;
   }
-  
+
   :deep(.el-menu--horizontal>.el-menu-item .el-icon) {
     margin-right: 1px;
     font-size: 12px;
   }
-  
+
   .user-info {
     margin-left: 5px;
   }

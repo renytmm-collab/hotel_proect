@@ -198,213 +198,208 @@ html > .el-menu--vertical,
 }
 </style>
 <style scoped>
-  .app-container {
-    min-height: 100vh;
-    background-color: #f5f7fa;
-    background-image: url('@/assets/images/background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-  }
-  
-  .el-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    /* background-color: rgba(255, 255, 255, 0.95); */
-  }
-  
-  .el-header {
-    background-color: #fff;
-    color: #333;
-    line-height: 60px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  
-  .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #409EFF;
-    letter-spacing: 1px;
-  }
-  
-  .el-menu {
-    border-bottom: none !important;
-  }
-  
-  .el-menu-item {
-    font-size: 16px;
-    transition: all 0.3s;
-  }
-  
-  .el-menu-item:hover {
-    color: #409EFF !important;
-    background-color: #ecf5ff !important;
-  }
-  
-  .el-menu-item.is-active {
-    color: #409EFF !important;
-    border-bottom: 2px solid #409EFF !important;
-  }
-  
-  .el-main {
-    flex: 1;
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    padding: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 10000px;
-  }
-  
-  .el-footer {
-    background-color: #324057;
-    color: #fff;
-    text-align: center;
-    line-height: 60px;
-    margin-top: auto;
-  }
-  
-  .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  </style>
-  
-  <style>
-  /* 全局样式 */
-  .el-message-box__btns .el-button {
-    background-color: #fff !important;
-    border-color: #dcdfe6 !important;
-    color: #606266 !important;
-  }
-  
-  .el-message-box__btns .el-button--primary {
-    background-color: #409eff !important;
-    border-color: #409eff !important;
-    color: #fff !important;
-  }
-  
-  .el-message-box__btns .el-button--default {
-    background-color: #fff !important;
-    border-color: #dcdfe6 !important;
-    color: #606266 !important;
-  }
-  
-  .el-message-box__btns .el-button--primary:hover,
-  .el-message-box__btns .el-button--primary:focus,
-  .el-message-box__btns .el-button--primary:active {
-    background-color: #409eff !important;
-    border-color: #409eff !important;
-    color: #fff !important;
-    opacity: 0.9;
-  }
-  
-  .el-message-box__btns .el-button--default:hover,
-  .el-message-box__btns .el-button--default:focus,
-  .el-message-box__btns .el-button--default:active {
-    background-color: #f5f7fa !important;
-    border-color: #dcdfe6 !important;
-    color: #606266 !important;
-  }
-  
-  /* 全局卡片样式 */
-  .el-card {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  /* 全局表格样式 */
-  .el-table {
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .el-table th {
-    background-color: #f5f7fa !important;
-    color: #606266;
-    font-weight: 600;
-  }
-  
-  /* 全局按钮样式 */
-  .el-button {
-    border-radius: 4px;
-    transition: all 0.3s;
-  }
-  
-  .el-button--primary {
-    background-color: #409eff !important;
-    border-color: #409eff !important;
-  }
-  
-  .el-button--primary:hover {
-    background-color: #66b1ff !important;
-    border-color: #66b1ff !important;
-  }
-  
-  /* 全局输入框样式 */
-  .el-input__inner {
-    border-radius: 4px;
-  }
-  
-  /* 全局分页样式 */
-  .el-pagination {
-    margin-top: 20px;
-    justify-content: center;
-  }
-  
-  /* 全局对话框样式 */
-  .el-dialog {
-    background-color: rgba(255, 255, 255, 0.98) !important;
-    border-radius: 8px;
-  }
-  
-  .el-dialog__header {
-    padding: 20px;
-    border-bottom: 1px solid #ebeef5;
-  }
-  
-  .el-dialog__body {
-    padding: 20px;
-  }
-  
-  .el-dialog__footer {
-    padding: 20px;
-    border-top: 1px solid #ebeef5;
-  }
-  
-  /* 添加背景图片样式 */
-  .el-main {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-  }
-  
-  .el-card {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .el-dialog {
-    background-color: rgba(255, 255, 255, 0.98) !important;
-  }
-  
-  .el-message-box {
-    background-color: rgba(255, 255, 255, 0.98) !important;
-  }
-  </style>
+.app-container {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.el-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* background-color: rgba(255, 255, 255, 0.95); */
+}
+
+.el-header {
+  background-color: #fff;
+  color: #333;
+  line-height: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #409EFF;
+  letter-spacing: 1px;
+}
+
+.el-menu {
+  border-bottom: none !important;
+}
+
+.el-menu-item {
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.el-menu-item:hover {
+  color: #409EFF !important;
+  background-color: #ecf5ff !important;
+}
+
+.el-menu-item.is-active {
+  color: #409EFF !important;
+  border-bottom: 2px solid #409EFF !important;
+}
+
+.el-main {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 10000px;
+}
+
+.el-footer {
+  background-color: #324057;
+  color: #fff;
+  text-align: center;
+  line-height: 60px;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+</style>
+
+<style>
+/* 全局样式 */
+.el-message-box__btns .el-button {
+  background-color: #fff !important;
+  border-color: #dcdfe6 !important;
+  color: #606266 !important;
+}
+
+.el-message-box__btns .el-button--primary {
+  background-color: #409eff !important;
+  border-color: #409eff !important;
+  color: #fff !important;
+}
+
+.el-message-box__btns .el-button--default {
+  background-color: #fff !important;
+  border-color: #dcdfe6 !important;
+  color: #606266 !important;
+}
+
+.el-message-box__btns .el-button--primary:hover,
+.el-message-box__btns .el-button--primary:focus,
+.el-message-box__btns .el-button--primary:active {
+  background-color: #409eff !important;
+  border-color: #409eff !important;
+  color: #fff !important;
+  opacity: 0.9;
+}
+
+.el-message-box__btns .el-button--default:hover,
+.el-message-box__btns .el-button--default:focus,
+.el-message-box__btns .el-button--default:active {
+  background-color: #f5f7fa !important;
+  border-color: #dcdfe6 !important;
+  color: #606266 !important;
+}
+
+/* 全局卡片样式 */
+.el-card {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* 全局表格样式 */
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.el-table th {
+  background-color: #f5f7fa !important;
+  color: #606266;
+  font-weight: 600;
+}
+
+/* 全局按钮样式 */
+.el-button {
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.el-button--primary {
+  background-color: #409eff !important;
+  border-color: #409eff !important;
+}
+
+.el-button--primary:hover {
+  background-color: #66b1ff !important;
+  border-color: #66b1ff !important;
+}
+
+/* 全局输入框样式 */
+.el-input__inner {
+  border-radius: 4px;
+}
+
+/* 全局分页样式 */
+.el-pagination {
+  margin-top: 20px;
+  justify-content: center;
+}
+
+/* 全局对话框样式 */
+.el-dialog {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  border-radius: 8px;
+}
+
+.el-dialog__header {
+  padding: 20px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.el-dialog__body {
+  padding: 20px;
+}
+
+.el-dialog__footer {
+  padding: 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+/* 添加背景图片样式 */
+.el-main {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.el-card {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.el-dialog {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+.el-message-box {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+</style>

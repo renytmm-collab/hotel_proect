@@ -345,6 +345,17 @@ export function getOccupancyStats(params) {
 }
 
 /**
+ * 获取数据大屏总览数据（今日营收、订单数、在住数、房态分布、支付占比等）
+ * @returns {Promise}
+ */
+export function getStatsOverview() {
+  return request({
+    url: '/api/admin/stats/overview',
+    method: 'get'
+  })
+}
+
+/**
  * 上传文件（头像/房型图片）
  * @param {FormData} data - 文件数据
  * @returns {Promise}
@@ -448,6 +459,7 @@ export default {
   getExpenseStats,
   getProfitStats,
   getOccupancyStats,
+  getStatsOverview,
   uploadFile,
   getRoomTypeOptions,
   getRoleOptions,

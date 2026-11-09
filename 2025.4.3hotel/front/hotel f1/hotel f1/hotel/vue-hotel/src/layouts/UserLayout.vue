@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
+import ChatWidget from '@/components/ChatWidget.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -31,7 +32,7 @@ const handleLogout = () => {
     // 清除登录信息
     localStorage.removeItem('token')
     localStorage.removeItem('loginUser')
-    
+
     ElMessage.success('已退出登录')
     router.push('/login')
   }).catch(() => {
@@ -66,10 +67,10 @@ const activeIndex = computed(() => {
       <div class="header-container">
         <div class="logo">酒店预订系统</div>
         <el-menu
-          :default-active="activeIndex"
-          class="user-menu"
-          mode="horizontal"
-          router
+            :default-active="activeIndex"
+            class="user-menu"
+            mode="horizontal"
+            router
         >
           <el-menu-item index="/">首页</el-menu-item>
           <el-menu-item index="/room/list">客房预订</el-menu-item>
@@ -78,7 +79,7 @@ const activeIndex = computed(() => {
           <el-menu-item index="/comment">我的评价</el-menu-item>
           <el-menu-item index="/favorite">我的收藏</el-menu-item>
         </el-menu>
-        
+
         <!-- 用户信息和退出登录 -->
         <div class="user-info">
           <el-dropdown @command="handleLogout">
@@ -104,6 +105,9 @@ const activeIndex = computed(() => {
         </keep-alive>
       </router-view>
     </div>
+
+    <!-- 智能客服机器人 -->
+    <ChatWidget />
   </div>
 </template>
 
@@ -197,17 +201,17 @@ const activeIndex = computed(() => {
   .user-content {
     padding: 0 10px;
   }
-  
+
   .logo {
     font-size: 16px;
     margin-right: 10px;
   }
-  
+
   :deep(.el-menu--horizontal > .el-menu-item) {
     padding: 0 10px;
     font-size: 14px;
   }
-  
+
   .user-info {
     margin-left: 10px;
   }
@@ -217,7 +221,7 @@ const activeIndex = computed(() => {
   .logo {
     display: none;
   }
-  
+
   :deep(.el-menu--horizontal > .el-menu-item) {
     padding: 0 8px;
     font-size: 13px;

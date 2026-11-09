@@ -38,6 +38,11 @@ logging:
         service: debug
         controller: info
 hotel:
+  deepseek:
+    # 大模型 API Key（请填写你自己的 DeepSeek API Key）
+    api-key: YOUR_DEEPSEEK_API_KEY
+    base-url: https://api.deepseek.com
+    model: deepseek-chat
   jwt:
     # 设置jwt签名加密时使用的秘钥
     admin-secret-key: wx2004081429112911

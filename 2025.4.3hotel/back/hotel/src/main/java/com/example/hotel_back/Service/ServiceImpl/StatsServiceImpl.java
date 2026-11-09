@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -253,5 +255,17 @@ public class StatsServiceImpl implements StatsService {
         }
 
         return statsList;
+    }
+    @Override
+    public Map<String, Object> getOverview() {
+        Map<String, Object> overview = new HashMap<>();
+        overview.put("todayIncome", statsMapper.getTodayIncome());
+        overview.put("todayOrderCount", statsMapper.getTodayOrderCount());
+        overview.put("stayingCount", statsMapper.getStayingCount());
+        overview.put("totalRooms", statsMapper.getTotalRoomCount());
+        overview.put("roomStatus", statsMapper.getRoomStatusCount());
+        overview.put("payment", statsMapper.getPaymentStats());
+        overview.put("totalIncome", statsMapper.getTotalIncome());
+        return overview;
     }
 }

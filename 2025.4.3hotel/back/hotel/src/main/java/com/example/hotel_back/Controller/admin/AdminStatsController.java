@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/stats")
@@ -127,5 +128,11 @@ public class AdminStatsController {
 
         List<OccupancyStatVO> statsList = statsService.getOccupancyStats(queryDTO);
         return Result.success(statsList);
+    }
+    @GetMapping("/overview")
+    public Result<Map<String, Object>> getOverview() {
+        log.info("查询数据大屏总览数据");
+        Map<String, Object> overview = statsService.getOverview();
+        return Result.success(overview);
     }
 }

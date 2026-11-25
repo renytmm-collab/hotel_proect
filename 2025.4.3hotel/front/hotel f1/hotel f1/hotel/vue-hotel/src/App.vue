@@ -93,40 +93,9 @@ body {
   background: #aaa;
 }
 
-/* 禁用垂直侧导航栏的错误显示 - 增强版 */
-.el-menu--vertical,
-.el-menu--vertical.el-menu--popup,
-body > .el-menu--vertical,
-body > .el-menu--vertical.el-menu,
-html > .el-menu--vertical,
-#app + .el-menu--vertical,
-[id="app"] ~ .el-menu--vertical {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  position: absolute !important;
-  left: -9999px !important;
-  z-index: -9999 !important;
-}
-
 /* 修复子菜单问题 */
 .is-opened .el-sub-menu__title {
   border-bottom-color: transparent !important;
-}
-
-/* 确保子菜单内容始终以下拉方式显示，不显示为侧边导航 */
-.el-menu--popup-container {
-  position: fixed !important;
-  left: auto !important;
-  top: auto !important;
-}
-
-/* 覆盖Element Plus可能的样式 */
-.el-menu-vertical-demo,
-.el-menu--vertical.el-menu,
-.el-popper.is-pure.el-menu--vertical {
-  display: none !important;
 }
 
 /* 确保水平子菜单正确显示 */
@@ -148,6 +117,7 @@ html > .el-menu--vertical,
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  background-color: #f5f7fa;
 }
 
 .el-container {
@@ -161,9 +131,8 @@ html > .el-menu--vertical,
   flex: 1;
   background-color: #f5f7fa;
   padding: 0;
-  display: flex;
-  justify-content: center;
   width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
 }
 
@@ -174,108 +143,21 @@ html > .el-menu--vertical,
 }
 
 .el-footer {
-  background-color: #324057;
-  color: #fff;
+  background-color: #0f172a;
+  color: #cbd5e1;
   text-align: center;
-  line-height: 60px;
+  line-height: 56px;
+  height: 56px;
   width: 100%;
   padding: 0;
+  font-size: 13px;
 }
 
 .footer-content {
-  width: 1200px;
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box;
-}
-
-/* 添加响应式设计 */
-@media screen and (max-width: 768px) {
-  .footer-content {
-    padding: 0 10px;
-  }
-}
-</style>
-<style scoped>
-.app-container {
-  min-height: 100vh;
-  background-color: #f5f7fa;
-}
-
-.el-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  /* background-color: rgba(255, 255, 255, 0.95); */
-}
-
-.el-header {
-  background-color: #fff;
-  color: #333;
-  line-height: 60px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #409EFF;
-  letter-spacing: 1px;
-}
-
-.el-menu {
-  border-bottom: none !important;
-}
-
-.el-menu-item {
-  font-size: 16px;
-  transition: all 0.3s;
-}
-
-.el-menu-item:hover {
-  color: #409EFF !important;
-  background-color: #ecf5ff !important;
-}
-
-.el-menu-item.is-active {
-  color: #409EFF !important;
-  border-bottom: 2px solid #409EFF !important;
-}
-
-.el-main {
-  flex: 1;
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 10000px;
-}
-
-.el-footer {
-  background-color: #324057;
-  color: #fff;
-  text-align: center;
-  line-height: 60px;
-  margin-top: auto;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
 }
 </style>
 

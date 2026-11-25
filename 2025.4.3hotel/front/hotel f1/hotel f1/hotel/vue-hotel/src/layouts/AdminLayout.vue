@@ -1,11 +1,10 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import {
   House,
   User,
-  Setting,
   Tickets,
   OfficeBuilding,
   Money,
@@ -15,147 +14,190 @@ import {
   Medal,
   DataAnalysis,
   Collection,
-  ArrowDown
+  ArrowDown,
+  Fold,
+  Expand,
+  Monitor
 } from '@element-plus/icons-vue'
-
-// 在组件挂载时检查是否有导航栏重复的问题
-onMounted(() => {
-  console.log('AdminLayout 组件已挂载')
-})
 
 const router = useRouter()
 const route = useRoute()
 const activeMenu = ref(route.path)
+const collapsed = ref(false)
 
-// 监听路由变化实时更新高亮菜单
 watch(() => route.path, (newPath) => {
   activeMenu.value = newPath
 }, { immediate: true })
 
-// 获取管理员用户名
-const adminUsername = ref(JSON.parse(localStorage.getItem('LoginEmployee'))?.username || '管理员')
+const isBigScreen = computed(() => route.path === '/admin/bigscreen')
 
-// 处理退出登录
+const pageTitle = computed(() => route.meta?.title || '运营管理后台')
+
+const adminUsername = ref((() => {
+  try {
+    const emp = JSON.parse(localStorage.getItem('LoginEmployee') || '{}')
+    return emp.realName || emp.username || '系统管理员'
+  } catch {
+    return '系统管理员'
+  }
+})())
+
 const handleLogout = () => {
-  ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+  ElMessageBox.confirm('确定要退出管理后台吗？', '退出登录', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-    // 清除登录信息
     localStorage.removeItem('LoginEmployee')
     localStorage.removeItem('staffLoggedIn')
     localStorage.removeItem('staffUsername')
     localStorage.removeItem('staffRole')
     localStorage.removeItem('staffToken')
-
-    // 跳转到登录页
     router.push('/login')
   }).catch(() => {})
 }
 
-// 处理下拉菜单命令
 const handleCommand = (command) => {
   if (command === 'logout') {
     handleLogout()
   } else if (command === 'profile') {
     router.push('/admin/profile-manage')
+  } else if (command === 'portal') {
+    router.push('/')
   }
 }
 </script>
 
 <template>
   <div class="admin-layout">
-    <el-container>
-      <el-header>
-        <div class="header-container">
-          <div class="logo">
-            <h1>酒店管理系统</h1>
+    <el-container class="layout-container">
+      <!-- 左侧深色现代侧边栏（全部 11 项菜单清晰可见，不再溢出遮挡） -->
+      <el-aside :width="collapsed ? '64px' : '220px'" class="admin-aside">
+        <div class="brand" @click="router.push('/admin')">
+          <span class="brand-badge">逸</span>
+          <div v-if="!collapsed" class="brand-text">
+            <div class="brand-name">逸云酒店管理</div>
+            <div class="brand-sub">Hotel Admin</div>
+          </div>
+        </div>
+
+        <el-menu
+          :default-active="activeMenu"
+          :collapse="collapsed"
+          :collapse-transition="false"
+          router
+          background-color="#0f172a"
+          text-color="#94a3b8"
+          active-text-color="#ffffff"
+          class="admin-menu"
+        >
+          <el-menu-item index="/admin">
+            <el-icon><House /></el-icon>
+            <template #title>运营总览</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/bigscreen" class="highlight-item">
+            <el-icon><DataAnalysis /></el-icon>
+            <template #title>
+              <span>经营数据大屏</span>
+              <span class="menu-pill pill-teal">实时</span>
+            </template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/knowledge" class="highlight-item">
+            <el-icon><Collection /></el-icon>
+            <template #title>
+              <span>RAG 知识库</span>
+              <span class="menu-pill pill-blue">AI</span>
+            </template>
+          </el-menu-item>
+
+          <div v-if="!collapsed" class="menu-group-label">客房与用户</div>
+
+          <el-menu-item index="/admin/room-type">
+            <el-icon><Tickets /></el-icon>
+            <template #title>房型管理</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/room">
+            <el-icon><OfficeBuilding /></el-icon>
+            <template #title>房间管理</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/account">
+            <el-icon><User /></el-icon>
+            <template #title>住客账户</template>
+          </el-menu-item>
+
+          <div v-if="!collapsed" class="menu-group-label">人事与财务</div>
+
+          <el-menu-item index="/admin/staff">
+            <el-icon><UserFilled /></el-icon>
+            <template #title>员工管理</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/attendance">
+            <el-icon><Clock /></el-icon>
+            <template #title>考勤管理</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/performance">
+            <el-icon><Medal /></el-icon>
+            <template #title>绩效管理</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/finance">
+            <el-icon><Money /></el-icon>
+            <template #title>财务管理</template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/report">
+            <el-icon><Document /></el-icon>
+            <template #title>报表统计</template>
+          </el-menu-item>
+        </el-menu>
+      </el-aside>
+
+      <!-- 右侧主内容区 -->
+      <el-container class="main-container">
+        <el-header class="admin-header">
+          <div class="header-left">
+            <el-button text class="collapse-btn" @click="collapsed = !collapsed">
+              <el-icon :size="18">
+                <Expand v-if="collapsed" />
+                <Fold v-else />
+              </el-icon>
+            </el-button>
+            <span class="page-title">{{ pageTitle }}</span>
           </div>
 
-          <el-menu
-              :default-active="activeMenu"
-              :ellipsis="false"
-              mode="horizontal"
-              router
-              class="el-menu-horizontal"
-          >
-            <el-menu-item index="/admin">
-              <el-icon><House /></el-icon>
-              <span>首页</span>
-            </el-menu-item>
+          <div class="header-right">
+            <el-button size="small" plain round @click="router.push('/')">
+              <el-icon><Monitor /></el-icon>
+              <span>住客门户</span>
+            </el-button>
 
-            <el-menu-item index="/admin/bigscreen">
-              <el-icon><DataAnalysis /></el-icon>
-              <span>数据大屏</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/account">
-              <el-icon><User /></el-icon>
-              <span>账户管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/staff">
-              <el-icon><UserFilled /></el-icon>
-              <span>员工管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/room-type">
-              <el-icon><Tickets /></el-icon>
-              <span>房型管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/room">
-              <el-icon><OfficeBuilding /></el-icon>
-              <span>房间管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/attendance">
-              <el-icon><Clock /></el-icon>
-              <span>考勤管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/performance">
-              <el-icon><Medal /></el-icon>
-              <span>绩效管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/finance">
-              <el-icon><Money /></el-icon>
-              <span>财务管理</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/report">
-              <el-icon><Document /></el-icon>
-              <span>报表统计</span>
-            </el-menu-item>
-
-            <el-menu-item index="/admin/knowledge">
-              <el-icon><Collection /></el-icon>
-              <span>知识库</span>
-            </el-menu-item>
-          </el-menu>
-
-          <div class="user-info">
             <el-dropdown @command="handleCommand">
-              <span class="el-dropdown-link">
-                {{ adminUsername }}
-                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              <span class="user-trigger">
+                <span class="user-avatar">{{ adminUsername.slice(0, 1) }}</span>
+                <span class="user-name">{{ adminUsername }}</span>
+                <el-icon class="el-icon--right"><ArrowDown /></el-icon>
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="profile">个人信息</el-dropdown-item>
-                  <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                  <el-dropdown-item command="portal">前往住客首页</el-dropdown-item>
+                  <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </div>
-        </div>
-      </el-header>
+        </el-header>
 
-      <el-main>
-        <router-view></router-view>
-      </el-main>
+        <el-main :class="['admin-main', { 'no-padding': isBigScreen }]">
+          <router-view />
+        </el-main>
+      </el-container>
     </el-container>
   </div>
 </template>
@@ -163,157 +205,191 @@ const handleCommand = (command) => {
 <style scoped>
 .admin-layout {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #f1f5f9;
 }
 
-.el-container {
+.layout-container {
   min-height: 100vh;
 }
 
-.el-header {
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 0;
-  width: 100%;
+.admin-aside {
+  background: linear-gradient(180deg, #0f172a 0%, #111c33 100%);
+  transition: width 0.22s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 12px rgba(15, 23, 42, 0.14);
+  z-index: 10;
 }
 
-.header-container {
+.brand {
+  height: 60px;
   display: flex;
   align-items: center;
-  height: 60px;
-  width: 100%;
-  padding: 0 10px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-  flex-shrink: 0;
-}
-
-.logo h1 {
-  color: #409EFF;
-  font-size: 16px;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.el-menu-horizontal {
-  border-bottom: none;
-  flex: 1;
-  overflow-x: auto;
-  white-space: nowrap;
-  width: calc(100% - 170px);
-  justify-content: flex-start;
-}
-
-.el-menu-horizontal::-webkit-scrollbar {
-  height: 4px;
-}
-
-.el-menu-horizontal::-webkit-scrollbar-thumb {
-  background-color: #dcdfe6;
-  border-radius: 3px;
-}
-
-:deep(.el-menu--horizontal>.el-menu-item) {
-  height: 60px;
-  line-height: 60px;
-  padding: 0 8px;
-  font-size: 14px;
-}
-
-:deep(.el-menu--horizontal>.el-menu-item .el-icon) {
-  margin-right: 3px;
-  font-size: 16px;
-}
-
-:deep(.el-menu--horizontal>.el-menu-item.is-active) {
-  border-bottom: 2px solid #409EFF;
-  color: #409EFF;
-}
-
-.user-info {
-  margin-left: 10px;
-  flex-shrink: 0;
-}
-
-.el-dropdown-link {
+  gap: 10px;
+  padding: 0 16px;
   cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.brand-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #14b8a6, #2563eb);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  color: #f8fafc;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.brand-sub {
+  color: #64748b;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.admin-menu {
+  border-right: none;
+  flex: 1;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.menu-group-label {
+  padding: 12px 20px 4px;
+  font-size: 11px;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+:deep(.el-menu-item) {
+  height: 44px;
+  line-height: 44px;
+  margin: 2px 8px;
+  border-radius: 8px;
+}
+
+:deep(.el-menu-item.is-active) {
+  background: linear-gradient(90deg, rgba(20, 184, 166, 0.24), rgba(37, 99, 235, 0.24)) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+:deep(.el-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: #e2e8f0 !important;
+}
+
+.menu-pill {
+  margin-left: auto;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+.pill-teal {
+  background: rgba(20, 184, 166, 0.2);
+  color: #2dd4bf;
+}
+
+.pill-blue {
+  background: rgba(59, 130, 246, 0.22);
+  color: #60a5fa;
+}
+
+.admin-header {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  color: #606266;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
-.el-dropdown-link:hover {
-  color: #409EFF;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.el-main {
+.collapse-btn {
+  padding: 6px;
+  color: #475569;
+}
+
+.page-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.user-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #334155;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.user-trigger:hover {
+  background-color: #f1f5f9;
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f766e, #2563eb);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-name {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.main-container {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-main {
   padding: 20px;
+  overflow-x: hidden;
+  min-width: 0;
 }
 
-@media (max-width: 1200px) {
-  :deep(.el-menu--horizontal>.el-menu-item) {
-    padding: 0 8px;
-    font-size: 13px;
-  }
-
-  :deep(.el-menu--horizontal>.el-menu-item .el-icon) {
-    margin-right: 3px;
-    font-size: 14px;
-  }
-
-  .logo h1 {
-    font-size: 14px;
-  }
+.admin-main.no-padding {
+  padding: 0;
 }
-
-@media (max-width: 992px) {
-  .header-container {
-    padding: 0 5px;
-  }
-
-  .logo h1 {
-    max-width: 100px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  :deep(.el-menu--horizontal>.el-menu-item) {
-    padding: 0 6px;
-    font-size: 12px;
-  }
-
-  :deep(.el-menu--horizontal>.el-menu-item .el-icon) {
-    margin-right: 2px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 768px) {
-  .logo {
-    margin-right: 5px;
-  }
-
-  .logo h1 {
-    font-size: 12px;
-    max-width: 80px;
-  }
-
-  :deep(.el-menu--horizontal>.el-menu-item) {
-    padding: 0 4px;
-    font-size: 12px;
-  }
-
-  :deep(.el-menu--horizontal>.el-menu-item .el-icon) {
-    margin-right: 1px;
-    font-size: 12px;
-  }
-
-  .user-info {
-    margin-left: 5px;
-  }
-}
-</style> 
+</style>

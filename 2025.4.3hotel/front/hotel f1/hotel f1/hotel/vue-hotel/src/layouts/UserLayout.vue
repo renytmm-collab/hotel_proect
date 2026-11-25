@@ -8,18 +8,23 @@ import ChatWidget from '@/components/ChatWidget.vue'
 const router = useRouter()
 const route = useRoute()
 
+// 判断是否已登录（修复未登录时右上角仍显示“用户 -> 退出登录”的逻辑问题）
+const isLoggedIn = computed(() => {
+  return Boolean(localStorage.getItem('token') && localStorage.getItem('loginUser'))
+})
+
 // 获取用户名
 const username = computed(() => {
   const userInfo = localStorage.getItem('loginUser')
   if (userInfo) {
     try {
       const user = JSON.parse(userInfo)
-      return user.nickname || user.username || '用户'
+      return user.nickname || user.username || user.realName || '用户'
     } catch (e) {
       return '用户'
     }
   }
-  return '用户'
+  return '访客'
 })
 
 // 处理退出登录
@@ -65,7 +70,7 @@ const activeIndex = computed(() => {
     <!-- 导航菜单 -->
     <div class="user-header">
       <div class="header-container">
-        <div class="logo">酒店预订系统</div>
+        <div class="logo" @click="router.push('/')" style="cursor:pointer;">逸云酒店</div>
         <el-menu
             :default-active="activeIndex"
             class="user-menu"
@@ -80,19 +85,24 @@ const activeIndex = computed(() => {
           <el-menu-item index="/favorite">我的收藏</el-menu-item>
         </el-menu>
 
-        <!-- 用户信息和退出登录 -->
+        <!-- 用户信息 / 登录入口 -->
         <div class="user-info">
-          <el-dropdown @command="handleLogout">
-            <span class="el-dropdown-link">
-              {{ username }}
-              <el-icon class="el-icon--right"><arrow-down /></el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <template v-if="isLoggedIn">
+            <el-dropdown @command="handleLogout">
+              <span class="el-dropdown-link">
+                {{ username }}
+                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </template>
+          <template v-else>
+            <el-button type="primary" size="small" round @click="router.push({ path: '/login', query: { tab: 'user' } })">登录 / 注册</el-button>
+          </template>
         </div>
       </div>
     </div>

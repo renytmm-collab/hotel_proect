@@ -444,33 +444,48 @@ router.beforeEach((to, from, next) => {
 
   // 访问登录页面的处理
   if (to.path === '/login') {
+    const targetTab = to.query.tab
+    const redirectPath = String(to.query.redirect || '')
+    const wantsUserLogin = targetTab === 'user' || (redirectPath && !redirectPath.startsWith('/admin') && !redirectPath.startsWith('/staff'))
+    const wantsStaffLogin = targetTab === 'staff' || redirectPath.startsWith('/admin') || redirectPath.startsWith('/staff')
+
+    // 若明确要登录住客端（如点击个人中心/我的订单/我的评价/我的收藏，或点击门户登录按钮），
+    // 不应因为浏览器里保留了管理员会话而强行跳回 /admin
+    if (wantsUserLogin) {
+      if (localStorage.getItem('token')) {
+        next(redirectPath || '/')
+        return
+      }
+      next()
+      return
+    }
+
     // 检查是否有管理员/员工登录
-    const employeeData = localStorage.getItem('LoginEmployee');
+    const employeeData = localStorage.getItem('LoginEmployee')
     if (employeeData) {
       try {
-        const employee = JSON.parse(employeeData);
-        // 根据角色重定向到不同页面
+        const employee = JSON.parse(employeeData)
         if (employee.roleId === 1) {
-          next('/admin');
-          return;
+          next(redirectPath.startsWith('/admin') ? redirectPath : '/admin')
+          return
         } else if (employee.roleId === 2) {
-          next('/staff/orders');
-          return;
+          next(redirectPath.startsWith('/staff') ? redirectPath : '/staff/orders')
+          return
         }
       } catch (e) {
-        console.error('解析登录信息失败', e);
+        console.error('解析登录信息失败', e)
       }
     }
 
-    // 检查普通用户是否登录
-    if (localStorage.getItem('token')) {
-      next('/');
-      return;
+    // 检查普通用户是否登录（仅在非员工登录跳转时重定向）
+    if (!wantsStaffLogin && localStorage.getItem('token')) {
+      next('/')
+      return
     }
 
     // 未登录访问登录页面，允许访问
-    next();
-    return;
+    next()
+    return
   }
 
   // 检查页面是否需要用户登录
@@ -478,12 +493,12 @@ router.beforeEach((to, from, next) => {
     // 检查用户是否已登录
     const isUserLoggedIn = localStorage.getItem('token')
     if (!isUserLoggedIn) {
-      // 保存原本要访问的路径
+      ElMessage.info('请先登录住客账号')
       next({
         path: '/login',
-        query: { redirect: to.fullPath }
-      });
-      return;
+        query: { redirect: to.fullPath, tab: 'user' }
+      })
+      return
     }
   }
 

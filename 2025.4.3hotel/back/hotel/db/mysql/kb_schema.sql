@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `kb_document` (
     `title`        VARCHAR(200) NOT NULL COMMENT '文档标题',
     `source`       VARCHAR(255) NOT NULL COMMENT '来源文件名',
     `content_hash` CHAR(64)     NOT NULL COMMENT '内容 SHA-256，用于幂等导入',
+    `content`      MEDIUMTEXT   NULL COMMENT '文档原文，用于重建索引',
     `chunk_count`  INT          NOT NULL DEFAULT 0 COMMENT '切片数',
     `create_time`  DATETIME     NULL,
     `update_time`  DATETIME     NULL,

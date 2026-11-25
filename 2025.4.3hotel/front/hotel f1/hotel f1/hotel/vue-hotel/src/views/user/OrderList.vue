@@ -46,6 +46,28 @@ const getStatusType = (status) => {
   }
 }
 
+// 本地房型默认主图映射（兜底后端未返回 roomImage 时，避免外链失效裂图）
+const ROOM_IMAGE_MAP = {
+  1: '/upload/room-single.jpg',
+  2: '/upload/39748644-0495-4455-8925-4bdb29134951.jpg',
+  3: '/upload/room-deluxe.jpg',
+  4: '/upload/64816e69-9816-43d2-9a83-3252ed0aedec.jpg',
+  5: '/upload/room-family.jpg'
+}
+
+const getRoomImage = (item) => {
+  if (item.roomImage && !item.roomImage.includes('baidu.com')) return item.roomImage
+  if (item.mainImage) return item.mainImage
+  if (item.roomTypeId && ROOM_IMAGE_MAP[item.roomTypeId]) return ROOM_IMAGE_MAP[item.roomTypeId]
+  const name = item.roomTypeName || ''
+  if (name.includes('单人')) return ROOM_IMAGE_MAP[1]
+  if (name.includes('双床')) return ROOM_IMAGE_MAP[2]
+  if (name.includes('豪华') || name.includes('大床')) return ROOM_IMAGE_MAP[3]
+  if (name.includes('套房') || name.includes('行政')) return ROOM_IMAGE_MAP[4]
+  if (name.includes('家庭') || name.includes('亲子')) return ROOM_IMAGE_MAP[5]
+  return ROOM_IMAGE_MAP[3]
+}
+
 // 获取订单列表
 const fetchOrderList = async () => {
   loading.value = true
@@ -78,7 +100,7 @@ const fetchOrderList = async () => {
           statusText: getStatusText(parseInt(item.status)),
           statusType: getStatusType(parseInt(item.status)),
           createTime: item.createTime,
-          roomImage: item.roomImage || 'https://img0.baidu.com/it/u=2141061893,3465688082&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333',
+          roomImage: getRoomImage(item),
           roomTypeId: item.roomTypeId,
           hasReview: item.hasReview || false,
           canPay: parseInt(item.status) === 1, // 只有状态为1（待支付）时才显示支付按钮

@@ -59,6 +59,18 @@ onMounted(() => {
 
 // 检查登录状态
 const checkLoginStatus = () => {
+  // 若是从住客受保护页面（个人中心/我的订单/我的评价/我的收藏）或门户登录按钮跳来，
+  // 直接展示住客登录表单，避免被后台管理员登录态拦截
+  if (route.query.tab === 'user') {
+    activeTab.value = 'user'
+    const userToken = localStorage.getItem('token')
+    const userData = localStorage.getItem('loginUser')
+    if (!userToken || !userData) {
+      isAlreadyLoggedIn.value = false
+      return
+    }
+  }
+
   // 检查是否是员工登录
   const staffLoggedIn = localStorage.getItem('staffLoggedIn') === 'true'
   const staffUsername = localStorage.getItem('staffUsername')
@@ -286,120 +298,206 @@ const goToRegister = () => {
   router.push('/user/register')
 }
 
-// 切换登录方式
+// 切换登录方式（保留已有另一端会话，方便答辩演示时平滑切换）
 const handleTabChange = (tab) => {
-  clearAllLoginState()
+  activeTab.value = tab
   isAlreadyLoggedIn.value = false
+}
+
+// 一键填充测试演示账号
+const fillDemoAccount = (type) => {
+  if (type === 'user') {
+    activeTab.value = 'user'
+    userLoginForm.phone = '13800138001'
+    userLoginForm.password = '123456'
+  } else if (type === 'admin') {
+    activeTab.value = 'staff'
+    staffLoginForm.empNo = 'admin'
+    staffLoginForm.password = '123456'
+  } else if (type === 'staff') {
+    activeTab.value = 'staff'
+    staffLoginForm.empNo = 'E001'
+    staffLoginForm.password = '123456'
+  }
 }
 </script>
 
 <template>
   <div class="unified-login-container">
-    <div class="login-box">
-      <div class="login-header">
-        <h1>酒店预订系统</h1>
-      </div>
-      
-      <!-- 已登录提示 -->
-      <div v-if="isAlreadyLoggedIn" class="already-logged-in">
-        <p>您已经以 <span class="highlight">{{ currentRole }}</span> 身份登录</p>
-        <p>当前账号: <span class="highlight">{{ currentUsername }}</span></p>
-        <div class="action-buttons">
-          <el-button type="primary" @click="enterSystem">继续使用</el-button>
-          <el-button type="danger" @click="handleLogout">退出登录</el-button>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <div class="login-card">
+      <!-- 左侧品牌视觉展示区 -->
+      <div class="brand-panel">
+        <div class="brand-overlay"></div>
+        <div class="brand-content">
+          <div class="brand-logo" @click="router.push('/')">
+            <span class="logo-mark">逸</span>
+            <div class="logo-text">
+              <div class="logo-cn">逸云精品酒店</div>
+              <div class="logo-en">YIYUN HOTEL SYSTEM</div>
+            </div>
+          </div>
+
+          <div class="brand-hero">
+            <h2>城市中心<br />智慧居停新体验</h2>
+            <p>融合线上自助预订、前台高效接待、实时经营数据大屏与 RAG 智能客服助手。</p>
+            <div class="brand-features">
+              <span class="feat-pill">✦ 经营数据大屏</span>
+              <span class="feat-pill">✦ RAG 知识库</span>
+              <span class="feat-pill">✦ AI 智能客服</span>
+            </div>
+          </div>
+
+          <div class="brand-footer">
+            <span class="back-home" @click="router.push('/')">← 返回首页浏览房型</span>
+          </div>
         </div>
       </div>
-      
-      <!-- 登录表单 -->
-      <div v-else class="login-form-wrapper">
-        <el-tabs v-model="activeTab" class="login-tabs" @tab-change="handleTabChange">
-          <el-tab-pane label="用户登录" name="user">
-            <el-form 
-              ref="userFormRef"
-              :model="userLoginForm" 
-              :rules="userRules" 
-              label-position="top"
+
+      <!-- 右侧表单区 -->
+      <div class="form-panel">
+        <div class="form-header">
+          <h1>欢迎登录</h1>
+          <p>请选择您的身份并输入账号密码</p>
+        </div>
+
+        <!-- 已登录提示 -->
+        <div v-if="isAlreadyLoggedIn" class="already-logged-in">
+          <div class="logged-badge">{{ currentRole }}</div>
+          <p class="logged-title">当前已登录账号：<span class="highlight">{{ currentUsername }}</span></p>
+          <p class="logged-sub">您可以直接进入系统，或退出后切换其他角色登录</p>
+          <div class="action-buttons">
+            <el-button type="primary" size="large" round @click="enterSystem">进入系统</el-button>
+            <el-button type="danger" plain size="large" round @click="handleLogout">退出登录</el-button>
+          </div>
+        </div>
+
+        <!-- 登录表单 -->
+        <div v-else class="login-form-wrapper">
+          <!-- 分段角色切换器 -->
+          <div class="role-switcher">
+            <button
+              type="button"
+              class="role-btn"
+              :class="{ active: activeTab === 'user' }"
+              @click="handleTabChange('user')"
             >
-              <el-form-item label="手机号" prop="phone">
-                <el-input 
-                  v-model="userLoginForm.phone"
-                  placeholder="请输入手机号"
-                  prefix-icon="Phone"
-                />
-              </el-form-item>
-              <el-form-item label="密码" prop="password">
-                <el-input 
-                  v-model="userLoginForm.password"
-                  type="password"
-                  placeholder="请输入密码"
-                  prefix-icon="Lock"
-                  show-password
-                  @keyup.enter="handleUserLogin"
-                />
-              </el-form-item>
-              <div class="form-actions">
-                <el-button 
-                  type="primary" 
-                  :loading="loading" 
-                  @click="handleUserLogin"
-                  style="width: 100%;"
-                >
-                  登录
-                </el-button>
-              </div>
-              <div class="form-links">
-                <el-button text @click="goToRegister">没有账号？立即注册</el-button>
-              </div>
-            </el-form>
-          </el-tab-pane>
-          
-          <el-tab-pane label="员工登录" name="staff">
-            <el-form
-              ref="staffFormRef"
-              :model="staffLoginForm"
-              :rules="staffRules"
-              label-position="top"
+              住客登录
+            </button>
+            <button
+              type="button"
+              class="role-btn"
+              :class="{ active: activeTab === 'staff' }"
+              @click="handleTabChange('staff')"
             >
-              <el-form-item label="员工编号" prop="empNo">
-                <el-input 
-                  v-model="staffLoginForm.empNo"
-                  placeholder="请输入员工编号"
-                  prefix-icon="User"
-                />
-              </el-form-item>
-              
-              <el-form-item label="密码" prop="password">
-                <el-input
-                  v-model="staffLoginForm.password"
-                  type="password"
-                  placeholder="请输入密码"
-                  prefix-icon="Lock"
-                  show-password
-                  @keyup.enter="handleStaffLogin"
-                />
-              </el-form-item>
-              
-              <el-form-item>
-                <el-button 
-                  type="primary" 
-                  class="login-button" 
-                  :loading="loading"
-                  @click="handleStaffLogin"
-                >
-                  登录
-                </el-button>
-              </el-form-item>
-              
-              <div class="login-tips">
-                <p>员工和管理员请使用员工编号登录</p>
-              </div>
-            </el-form>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-      
-      <div class="login-footer">
-        <p>© {{ new Date().getFullYear() }} 酒店预订管理系统 版权所有</p>
+              员工 / 管理员
+            </button>
+          </div>
+
+          <!-- 住客登录 -->
+          <el-form
+            v-if="activeTab === 'user'"
+            ref="userFormRef"
+            :model="userLoginForm"
+            :rules="userRules"
+            label-position="top"
+            class="styled-form"
+          >
+            <el-form-item label="手机号" prop="phone">
+              <el-input
+                v-model="userLoginForm.phone"
+                size="large"
+                placeholder="请输入 11 位手机号"
+                prefix-icon="Phone"
+                clearable
+              />
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                v-model="userLoginForm.password"
+                size="large"
+                type="password"
+                placeholder="请输入登录密码"
+                prefix-icon="Lock"
+                show-password
+                @keyup.enter="handleUserLogin"
+              />
+            </el-form-item>
+
+            <el-button
+              type="primary"
+              size="large"
+              class="submit-btn"
+              :loading="loading"
+              @click="handleUserLogin"
+            >
+              登录住客端
+            </el-button>
+
+            <div class="quick-demo">
+              <span>演示快捷填充：</span>
+              <button type="button" class="demo-chip" @click="fillDemoAccount('user')">住客（13800138001）</button>
+            </div>
+
+            <div class="form-links">
+              <span class="link-muted">还没有账号？</span>
+              <el-button text type="primary" @click="goToRegister">立即免费注册 →</el-button>
+            </div>
+          </el-form>
+
+          <!-- 员工 / 管理员登录 -->
+          <el-form
+            v-else
+            ref="staffFormRef"
+            :model="staffLoginForm"
+            :rules="staffRules"
+            label-position="top"
+            class="styled-form"
+          >
+            <el-form-item label="员工编号 / 管理账号" prop="empNo">
+              <el-input
+                v-model="staffLoginForm.empNo"
+                size="large"
+                placeholder="例如：admin 或 E001"
+                prefix-icon="User"
+                clearable
+              />
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                v-model="staffLoginForm.password"
+                size="large"
+                type="password"
+                placeholder="请输入密码"
+                prefix-icon="Lock"
+                show-password
+                @keyup.enter="handleStaffLogin"
+              />
+            </el-form-item>
+
+            <el-button
+              type="primary"
+              size="large"
+              class="submit-btn"
+              :loading="loading"
+              @click="handleStaffLogin"
+            >
+              登录工作台
+            </el-button>
+
+            <div class="quick-demo">
+              <span>演示快捷填充：</span>
+              <button type="button" class="demo-chip" @click="fillDemoAccount('admin')">管理员（admin）</button>
+              <button type="button" class="demo-chip" @click="fillDemoAccount('staff')">前台（E001）</button>
+            </div>
+          </el-form>
+        </div>
+
+        <div class="login-footer">
+          © {{ new Date().getFullYear() }} 逸云酒店管理系统 · 安全加密登录
+        </div>
       </div>
     </div>
   </div>
@@ -407,104 +505,334 @@ const handleTabChange = (tab) => {
 
 <style scoped>
 .unified-login-container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
-  padding: 20px;
-}
-
-.login-box {
-  width: 100%;
-  max-width: 450px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-  padding: 30px;
-  position: relative;
+  background: radial-gradient(circle at 20% 20%, #172554 0%, #0f172a 55%, #090f1d 100%);
+  padding: 24px;
   overflow: hidden;
 }
 
-.login-header {
-  text-align: center;
-  margin-bottom: 30px;
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.45;
 }
 
-.login-header h1 {
-  font-size: 28px;
-  color: #303133;
-  margin-bottom: 10px;
+.orb-1 {
+  width: 420px;
+  height: 420px;
+  background: #0f766e;
+  top: -120px;
+  left: -80px;
 }
 
-.login-form-wrapper {
-  margin-bottom: 20px;
+.orb-2 {
+  width: 460px;
+  height: 460px;
+  background: #2563eb;
+  bottom: -140px;
+  right: -100px;
 }
 
-.login-tabs {
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 920px;
+  min-height: 560px;
+  display: grid;
+  grid-template-columns: 1.02fr 1fr;
+  background: #ffffff;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+}
+
+/* 左侧实景品牌面板 */
+.brand-panel {
+  position: relative;
+  background-image: url('/upload/room-deluxe.jpg');
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  display: flex;
+}
+
+.brand-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.84) 0%, rgba(15, 118, 110, 0.68) 58%, rgba(15, 23, 42, 0.90) 100%);
+}
+
+.brand-content {
+  position: relative;
+  z-index: 1;
+  padding: 36px 34px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: 100%;
 }
 
-.form-actions {
-  margin-top: 20px;
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.logo-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #14b8a6, #3b82f6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(20, 184, 166, 0.35);
+}
+
+.logo-cn {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.logo-en {
+  font-size: 10px;
+  color: #94a3b8;
+  letter-spacing: 1.6px;
+}
+
+.brand-hero h2 {
+  font-size: 30px;
+  line-height: 1.35;
+  margin: 0 0 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.brand-hero p {
+  margin: 0 0 22px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(241, 245, 249, 0.88);
+}
+
+.brand-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feat-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(6px);
+}
+
+.back-home {
+  font-size: 13px;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.back-home:hover {
+  color: #5eead4;
+}
+
+/* 右侧表单面板 */
+.form-panel {
+  padding: 40px 42px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+}
+
+.form-header h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.form-header p {
+  margin: 0 0 24px;
+  font-size: 13.5px;
+  color: #64748b;
+}
+
+.role-switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 22px;
+}
+
+.role-btn {
+  border: none;
+  background: transparent;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.role-btn.active {
+  background: #ffffff;
+  color: #0f766e;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.styled-form :deep(.el-form-item__label) {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  padding-bottom: 6px;
+}
+
+.styled-form :deep(.el-input__wrapper) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #cbd5e1 inset;
+  padding: 4px 12px;
+}
+
+.styled-form :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1.5px #0f766e inset !important;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 44px;
+  margin-top: 8px;
+  border-radius: 10px !important;
+  font-size: 15px;
+  font-weight: 600;
+  border: none !important;
+  background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.34);
+}
+
+.quick-demo {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.demo-chip {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demo-chip:hover {
+  border-color: #0f766e;
+  color: #0f766e;
+  background: #f0fdfa;
 }
 
 .form-links {
-  margin-top: 15px;
+  margin-top: 16px;
   display: flex;
+  align-items: center;
   justify-content: center;
+  font-size: 13px;
 }
 
-.login-button {
-  width: 100%;
-  margin-top: 10px;
+.link-muted {
+  color: #64748b;
 }
 
 .already-logged-in {
   text-align: center;
-  margin: 30px 0;
+  padding: 24px 0;
 }
 
-.already-logged-in p {
-  margin-bottom: 15px;
-  color: #606266;
+.logged-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: #f0fdfa;
+  color: #0f766e;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.logged-title {
   font-size: 16px;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.logged-sub {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 24px;
 }
 
 .highlight {
-  color: #409EFF;
-  font-weight: bold;
+  color: #0f766e;
+  font-weight: 700;
 }
 
 .action-buttons {
   display: flex;
-  gap: 15px;
   justify-content: center;
-  margin-top: 20px;
-}
-
-.login-tips {
-  text-align: center;
-  margin-top: 15px;
-  color: #909399;
-  font-size: 14px;
+  gap: 12px;
 }
 
 .login-footer {
   text-align: center;
-  margin-top: 30px;
-  color: #909399;
-  font-size: 12px;
+  margin-top: 20px;
+  color: #94a3b8;
+  font-size: 11.5px;
 }
 
-/* 响应式调整 */
-@media (max-width: 480px) {
-  .login-box {
-    padding: 20px;
+@media (max-width: 780px) {
+  .login-card {
+    grid-template-columns: 1fr;
+    max-width: 440px;
   }
-  
-  .login-header h1 {
-    font-size: 24px;
+  .brand-panel {
+    display: none;
+  }
+  .form-panel {
+    padding: 32px 26px 24px;
   }
 }
 </style> 

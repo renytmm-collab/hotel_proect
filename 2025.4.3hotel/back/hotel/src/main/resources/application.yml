@@ -76,8 +76,8 @@ hotel:
     user-token-name: token
 # 文件上传配置
 file:
-  # 文件上传本地存储路径
-  upload-path: D:/2025.4.3hotel/upload
+  # 文件上传本地存储路径（支持环境变量覆盖）
+  upload-path: ${HOTEL_UPLOAD_PATH:D:/Software_analyze/hotel_proect/2025.4.3hotel/upload}
   # 文件访问URL前缀
   access-url: /upload
 

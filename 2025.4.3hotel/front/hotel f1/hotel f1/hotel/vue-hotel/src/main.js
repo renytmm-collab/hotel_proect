@@ -12,10 +12,6 @@ import './assets/css/tailwind.css'
 import './assets/css/button-fix.css'
 // 导入前台端按钮样式
 import './assets/css/staff-buttons.css'
-// 导入全局菜单样式
-import './assets/css/global-menu-fix.css'
-// 导入菜单清理脚本
-import { setupMenuCleaner } from './assets/css/menu-cleanup.js'
 
 const app = createApp(App)
 
@@ -30,6 +26,3 @@ app.use(ElementPlus, {
 })
 
 app.mount('#app')
-
-// 应用挂载后，执行菜单清理
-setupMenuCleaner()

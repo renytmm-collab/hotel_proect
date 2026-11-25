@@ -40,9 +40,10 @@ public class AdminController {
 
         Employee employee = adminService.login(employeeLoginDTO);
 
-        // 登录成功后，生成 jwt 令牌
+        // 登录成功后，生成 jwt 令牌（写入员工 ID 与角色 ID 用于后端权限校验）
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.EMP_ID, employee.getId());
+        claims.put(JwtClaimsConstant.ROLE_ID, employee.getRoleId());
         // 使用更新后的JwtUtil创建JWT令牌
         String token = JwtUtil.createJWT(
                 jwtProperties.getAdminSecretKey(),

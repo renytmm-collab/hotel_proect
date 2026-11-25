@@ -4,13 +4,26 @@
     <transition name="cw-fade">
       <div v-if="open" class="cw-panel">
         <div class="cw-header">
-          <span class="cw-title">智能客服 <em class="cw-badge">RAG</em></span>
-          <span class="cw-close" @click="open = false">×</span>
+          <span class="cw-title">逸云智能客服 <em class="cw-badge">RAG</em></span>
+          <div class="cw-header-actions">
+            <span v-if="messages.length" class="cw-clear" title="清空对话" @click="clearMessages">清空</span>
+            <span class="cw-close" @click="open = false">×</span>
+          </div>
         </div>
 
         <div class="cw-body" ref="bodyRef" @scroll="onBodyScroll">
           <div v-if="messages.length === 0" class="cw-empty">
-            你好，我是酒店智能客服 👋<br />可以问我房型价格、入住退房、取消退款等问题
+            <div class="cw-welcome">你好，我是逸云酒店智能客服 👋</div>
+            <div class="cw-sub">支持实时查询房型空房与酒店政策，点击下方常见问题快速体验：</div>
+            <div class="cw-quick-list">
+              <button
+                v-for="q in quickQuestions"
+                :key="q"
+                class="cw-quick-btn"
+                :disabled="loading"
+                @click="askQuick(q)"
+              >{{ q }}</button>
+            </div>
           </div>
           <div
             v-for="(m, i) in messages"
@@ -66,6 +79,24 @@ const loading = ref(false)
 const messages = ref([])
 const bodyRef = ref(null)
 const atBottom = ref(true)
+
+const quickQuestions = [
+  '一家三口住什么房合适？',
+  '现在还有哪些空房？',
+  '入住押金要交多少钱？',
+  '早餐几点开始供应？',
+  '取消订单会扣费吗？'
+]
+
+function askQuick(q) {
+  input.value = q
+  send()
+}
+
+function clearMessages() {
+  if (loading.value) return
+  messages.value = []
+}
 
 // 每次重新登录（登录态变化）时清空历史提问，避免看到上一个账号的对话
 watch(
@@ -273,6 +304,25 @@ function scrollToBottom(force = false) {
   background: rgba(255, 255, 255, 0.25);
 }
 
+.cw-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cw-clear {
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background 0.2s;
+}
+
+.cw-clear:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 .cw-close {
   font-size: 22px;
   cursor: pointer;
@@ -288,10 +338,47 @@ function scrollToBottom(force = false) {
 
 .cw-empty {
   text-align: center;
-  color: #909399;
+  color: #64748b;
   font-size: 13px;
-  margin-top: 60px;
-  line-height: 1.8;
+  margin-top: 22px;
+  line-height: 1.7;
+}
+
+.cw-welcome {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.cw-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+.cw-quick-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cw-quick-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 12px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cw-quick-btn:hover {
+  border-color: #3b82f6;
+  color: #2563eb;
+  background: #eff6ff;
 }
 
 .cw-msg {

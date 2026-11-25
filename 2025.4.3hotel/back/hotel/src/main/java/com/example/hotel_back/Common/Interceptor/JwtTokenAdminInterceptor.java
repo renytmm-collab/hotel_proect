@@ -43,19 +43,43 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
         //2、校验令牌
         try {
-            log.info("jwt校验:{}", token);
+            log.debug("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
-            log.info("当前员工id:{}", empId);
             BaseContext.setCurrentId(empId);
-//            Long roleId = Long.valueOf(claims.get(JwtClaimsConstant.ROLE_ID).toString());
-//            log.info("当前员工角色id:{}", roleId);
+
+            // 角色权限校验：/admin/** 管理类接口仅允许管理员（roleId = 1）访问，放行员工个人资料与退出接口
+            String uri = request.getRequestURI();
+            Object roleClaim = claims.get(JwtClaimsConstant.ROLE_ID);
+            boolean isSelfEndpoint = uri != null && (
+                    uri.startsWith("/admin/common/")
+                    || uri.equals("/admin/logout")
+                    || uri.equals("/admin/info")
+                    || uri.equals("/admin/updateInfo")
+                    || uri.equals("/admin/updatePassword")
+            );
+            if (uri != null && uri.startsWith("/admin/") && !isSelfEndpoint) {
+                Long roleId = roleClaim == null ? null : Long.valueOf(roleClaim.toString());
+                if (roleId == null || roleId != 1L) {
+                    log.warn("越权拦截：员工 {} (roleId={}) 尝试访问 {}", empId, roleId, uri);
+                    BaseContext.removeCurrentId();
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return false;
+                }
+            }
             //3、通过，放行
             return true;
         } catch (Exception ex) {
             //4、不通过，响应401状态码
+            BaseContext.removeCurrentId();
             response.setStatus(401);
             return false;
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        // 请求结束后清理 ThreadLocal，防止线程池复用导致的身份串号与内存泄漏
+        BaseContext.removeCurrentId();
     }
 }
